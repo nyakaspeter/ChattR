@@ -89,7 +89,7 @@ export const leaveRoom = async (req, res) => {
     const room = await Room.findById(roomId);
 
     if (room.owner.equals(req.user._id))
-      throw new err("It's not possible to leave your own room");
+      throw new Error("It's not possible to leave your own room");
 
     await Room.findByIdAndUpdate(roomId, { $pull: { users: req.user._id } });
 
