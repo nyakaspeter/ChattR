@@ -189,9 +189,7 @@ const Main = () => {
     });
 
     session.current.on("streamDestroyed", (event) => {
-      setSubscribers(
-        subscribers.filter((sub) => sub !== event.stream.streamManager)
-      );
+      setSubscribers(subscribers.filter((sub) => sub !== event.stream.streamManager));
     });
 
     session.current.on("signal:message", (event) => {
@@ -221,11 +219,7 @@ const Main = () => {
         setPublisher(publisher);
       })
       .catch((error) => {
-        console.log(
-          "There was an error connecting to the session:",
-          error.code,
-          error.message
-        );
+        console.log("There was an error connecting to the session:", error.code, error.message);
       });
   };
 
@@ -295,9 +289,7 @@ const Main = () => {
           <Box flex="1" display="flex" flexDirection="column">
             <Box display="flex">
               <Box flex="1" display="flex" flexDirection="column">
-                <Typography variant="h5">
-                  {connectedRoom.name + (connectedRoomOwned ? " 👑" : "")}
-                </Typography>
+                <Typography variant="h5">{connectedRoom.name + (connectedRoomOwned ? " 👑" : "")}</Typography>
                 <Typography variant="subtitle2">{connectedRoom._id}</Typography>
               </Box>
 
@@ -327,10 +319,7 @@ const Main = () => {
                 </Box>
               )}
 
-              <Button
-                onClick={() => leaveRoom(connectedRoom._id)}
-                variant="outlined"
-              >
+              <Button onClick={() => leaveRoom(connectedRoom._id)} variant="outlined">
                 Leave
               </Button>
 
@@ -341,13 +330,7 @@ const Main = () => {
 
             <Box flex="1" my={2}>
               {publisher && <Video streamManager={publisher} />}
-              {subscribers &&
-                subscribers.map((subscriber) => (
-                  <Video
-                    key={subscribers.indexOf(subscriber)}
-                    streamManager={subscriber}
-                  />
-                ))}
+              {subscribers && subscribers.map((subscriber, index) => <Video key={index} streamManager={subscriber} />)}
             </Box>
           </Box>
         )}
@@ -380,11 +363,7 @@ const Main = () => {
                       }}
                       color="white"
                     >
-                      <Typography
-                        style={{ overflow: "auto", wordWrap: "break-word" }}
-                      >
-                        {message.text}
-                      </Typography>
+                      <Typography style={{ overflow: "auto", wordWrap: "break-word" }}>{message.text}</Typography>
                       {message.files.map((file) => (
                         <li key={file.id}>
                           <a href={`/api/file/${file.id}`} download>
@@ -427,9 +406,7 @@ const Main = () => {
                     style={{ justifyContent: "flex-start" }}
                     fullWidth
                     variant="outlined"
-                    onClick={() =>
-                      setSelectedFiles(selectedFiles.filter((f) => f !== file))
-                    }
+                    onClick={() => setSelectedFiles(selectedFiles.filter((f) => f !== file))}
                   >
                     {file.name}
                   </Button>

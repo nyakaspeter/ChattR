@@ -1,5 +1,4 @@
 import mongoose from "mongoose";
-
 import Message from "./message.js";
 
 const roomSchema = mongoose.Schema({

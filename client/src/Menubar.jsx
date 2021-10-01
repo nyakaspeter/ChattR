@@ -1,11 +1,4 @@
-import {
-  AppBar,
-  Avatar,
-  Box,
-  IconButton,
-  Toolbar,
-  Typography,
-} from "@material-ui/core";
+import { AppBar, Avatar, Box, IconButton, Toolbar, Typography } from "@material-ui/core";
 import ExitToAppIcon from "@material-ui/icons/ExitToApp";
 import { useContext } from "react";
 import UserProvider from "./UserProvider";
@@ -16,12 +9,7 @@ const Menubar = () => {
   return (
     <AppBar position="static">
       <Toolbar>
-        <Box
-          display="flex"
-          flexGrow="1"
-          justifyContent="space-between"
-          alignItems="center"
-        >
+        <Box display="flex" flexGrow="1" justifyContent="space-between" alignItems="center">
           <Typography variant="h6">WebRTC Video Conference</Typography>
 
           {user ? (

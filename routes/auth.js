@@ -11,13 +11,9 @@ router.get(
   })
 );
 
-router.get(
-  "/login/google/callback",
-  passport.authenticate("google"),
-  (req, res) => {
-    res.redirect("/");
-  }
-);
+router.get("/login/google/callback", passport.authenticate("google"), (req, res) => {
+  res.redirect("/");
+});
 
 router.get("/logout", (req, res) => {
   req.logout();

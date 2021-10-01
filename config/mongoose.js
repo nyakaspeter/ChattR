@@ -6,8 +6,7 @@ import GridFsStorage from "multer-gridfs-storage";
 dotenv.config();
 
 const UPLOAD_BUCKET_NAME = process.env.MONGODB_UPLOAD_BUCKET_NAME || "uploads";
-const UPLOAD_MAX_FILE_SIZE =
-  process.env.MONGODB_UPLOAD_MAX_FILE_SIZE || 50 * 1024 * 1024;
+const UPLOAD_MAX_FILE_SIZE = process.env.MONGODB_UPLOAD_MAX_FILE_SIZE || 50 * 1024 * 1024;
 
 export let gfs;
 

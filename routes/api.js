@@ -1,21 +1,20 @@
 import express from "express";
-
+import { upload } from "../config/mongoose.js";
+import { getFile } from "../controllers/file.js";
 import {
-  getRooms,
+  connectRoom,
   createRoom,
-  editRoom,
   deleteRoom,
+  disconnectRoom,
+  editRoom,
+  getRooms,
   joinRoom,
   leaveRoom,
   sendMessage,
-  connectRoom,
-  disconnectRoom,
   startRecording,
   stopRecording,
 } from "../controllers/room.js";
-import { getFile } from "../controllers/file.js";
 import { getUser } from "../controllers/user.js";
-import { upload } from "../config/mongoose.js";
 
 const router = express.Router();
 

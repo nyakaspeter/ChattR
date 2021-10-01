@@ -1,9 +1,9 @@
-import Room from "../models/room.js";
-import Message from "../models/message.js";
-import { OpenViduRole } from "openvidu-node-client";
-import { OV, sessions, sessionTokens } from "../config/openvidu.js";
 import Axios from "axios";
 import dotenv from "dotenv";
+import { OpenViduRole } from "openvidu-node-client";
+import { OV, sessions, sessionTokens } from "../config/openvidu.js";
+import Message from "../models/message.js";
+import Room from "../models/room.js";
 
 dotenv.config();
 
@@ -39,11 +39,10 @@ export const editRoom = async (req, res) => {
   const roomId = req.params.roomId;
 
   try {
-    const room = await Room.findByIdAndUpdate(
-      roomId,
-      { name: editedRoom.name },
-      { new: true }
-    ).populate({ path: "messages.sender", model: "User" });
+    const room = await Room.findByIdAndUpdate(roomId, { name: editedRoom.name }, { new: true }).populate({
+      path: "messages.sender",
+      model: "User",
+    });
 
     res.json(room);
   } catch (err) {
@@ -69,11 +68,10 @@ export const joinRoom = async (req, res) => {
   const roomId = req.params.roomId;
 
   try {
-    const room = await Room.findByIdAndUpdate(
-      roomId,
-      { $addToSet: { users: req.user._id } },
-      { new: true }
-    ).populate({ path: "messages.sender", model: "User" });
+    const room = await Room.findByIdAndUpdate(roomId, { $addToSet: { users: req.user._id } }, { new: true }).populate({
+      path: "messages.sender",
+      model: "User",
+    });
 
     res.json(room);
   } catch (err) {
@@ -88,8 +86,7 @@ export const leaveRoom = async (req, res) => {
   try {
     const room = await Room.findById(roomId);
 
-    if (room.owner.equals(req.user._id))
-      throw new Error("It's not possible to leave your own room");
+    if (room.owner.equals(req.user._id)) throw new Error("It's not possible to leave your own room");
 
     await Room.findByIdAndUpdate(roomId, { $pull: { users: req.user._id } });
 
@@ -127,9 +124,7 @@ export const sendMessage = async (req, res) => {
       },
       {
         headers: {
-          Authorization: `Basic ${Buffer.from(
-            `OPENVIDUAPP:${process.env.OPENVIDU_SECRET}`
-          ).toString("base64")}`,
+          Authorization: `Basic ${Buffer.from(`OPENVIDUAPP:${process.env.OPENVIDU_SECRET}`).toString("base64")}`,
           "Content-Type": "application/json",
         },
       }
@@ -183,9 +178,7 @@ export const stopRecording = async (req, res) => {
       },
       {
         headers: {
-          Authorization: `Basic ${Buffer.from(
-            `OPENVIDUAPP:${process.env.OPENVIDU_SECRET}`
-          ).toString("base64")}`,
+          Authorization: `Basic ${Buffer.from(`OPENVIDUAPP:${process.env.OPENVIDU_SECRET}`).toString("base64")}`,
           "Content-Type": "application/json",
         },
       }
