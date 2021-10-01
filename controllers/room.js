@@ -113,7 +113,7 @@ export const sendMessage = async (req, res) => {
 
     await Room.findByIdAndUpdate(roomId, { $push: { messages: newMessage } });
 
-    await newMessage.execPopulate({ path: "sender", model: "User" });
+    await newMessage.populate({ path: "sender", model: "User" });
 
     await Axios.post(
       `${process.env.OPENVIDU_URL}/openvidu/api/signal`,

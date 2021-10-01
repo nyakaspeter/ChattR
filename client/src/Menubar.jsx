@@ -1,5 +1,5 @@
-import { AppBar, Avatar, Box, IconButton, Toolbar, Typography } from "@material-ui/core";
-import ExitToAppIcon from "@material-ui/icons/ExitToApp";
+import { ExitToApp } from "@mui/icons-material";
+import { AppBar, Avatar, Box, IconButton, Toolbar, Typography } from "@mui/material";
 import { useContext } from "react";
 import UserProvider from "./UserProvider";
 
@@ -16,8 +16,8 @@ const Menubar = () => {
             <Box display="flex" alignItems="center">
               <Avatar style={{ marginRight: 16 }} src={user.picture} />
               <Typography style={{ marginRight: 16 }}>{user.name}</Typography>
-              <IconButton href="/logout">
-                <ExitToAppIcon style={{ color: "white" }} />
+              <IconButton href="/logout" size="large">
+                <ExitToApp style={{ color: "white" }} />
               </IconButton>
             </Box>
           ) : (

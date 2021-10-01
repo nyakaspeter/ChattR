@@ -1,4 +1,4 @@
-import { Avatar, Box, Button, TextField, Typography } from "@material-ui/core";
+import { Avatar, Box, Button, TextField, Typography } from "@mui/material";
 import Axios from "axios";
 import { OpenVidu } from "openvidu-browser";
 import { useContext, useEffect, useRef, useState } from "react";

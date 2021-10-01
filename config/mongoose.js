@@ -1,7 +1,7 @@
 import dotenv from "dotenv";
 import mongoose from "mongoose";
 import multer from "multer";
-import GridFsStorage from "multer-gridfs-storage";
+import { GridFsStorage } from "multer-gridfs-storage";
 
 dotenv.config();
 
@@ -10,13 +10,7 @@ const UPLOAD_MAX_FILE_SIZE = process.env.MONGODB_UPLOAD_MAX_FILE_SIZE || 50 * 10
 
 export let gfs;
 
-mongoose
-  .connect(process.env.MONGODB_URI, {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
-    useFindAndModify: false,
-  })
-  .catch((err) => console.log(err.message));
+mongoose.connect(process.env.MONGODB_URI).catch((err) => console.log(err.message));
 
 mongoose.connection.once("open", () => {
   gfs = new mongoose.mongo.GridFSBucket(mongoose.connection.db, {
