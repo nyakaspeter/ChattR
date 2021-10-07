@@ -5,6 +5,9 @@ import User from "../models/user.js";
 
 dotenv.config();
 
+const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID;
+const GOOGLE_CLIENT_SECRET = process.env.GOOGLE_CLIENT_SECRET;
+
 passport.serializeUser((user, done) => {
   done(null, user._id);
 });
@@ -18,11 +21,11 @@ passport.deserializeUser((id, done) => {
 passport.use(
   new GoogleStrategy(
     {
-      clientID: process.env.GOOGLE_CLIENT_ID,
-      clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-      callbackURL: "/login/google/callback",
+      clientID: GOOGLE_CLIENT_ID,
+      clientSecret: GOOGLE_CLIENT_SECRET,
+      callbackURL: "/auth/google/callback",
     },
-    function (accessToken, refreshToken, profile, done) {
+    (accessToken, refreshToken, profile, done) => {
       User.findOneAndUpdate(
         {
           googleId: profile.id,
@@ -32,7 +35,7 @@ passport.use(
         },
         {},
         { new: true, upsert: true },
-        function (err, user) {
+        (err, user) => {
           return done(err, user);
         }
       );

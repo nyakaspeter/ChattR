@@ -15,7 +15,7 @@ export const getFile = async (req, res) => {
 
     gfs.openDownloadStream(fileId).pipe(res);
   } catch (err) {
-    console.log(err);
+    console.error(err);
     res.status(404).end();
   }
 };

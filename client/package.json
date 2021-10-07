@@ -5,6 +5,8 @@
   "dependencies": {
     "@emotion/react": "^11.4.1",
     "@emotion/styled": "^11.3.0",
+    "@hookstate/core": "^3.0.13",
+    "@hookstate/persistence": "^3.0.0",
     "@mui/icons-material": "^5.0.1",
     "@mui/material": "^5.0.2",
     "axios": "^0.22.0",
@@ -17,8 +19,7 @@
     "web-vitals": "^2.1.0"
   },
   "scripts": {
-    "start": "react-scripts build && serve -s build",
-    "dev": "react-scripts start",
+    "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
@@ -40,8 +41,5 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
-  },
-  "devDependencies": {
-    "serve": "^12.0.1"
   }
 }

@@ -1,12 +1,13 @@
+import { useHookstate } from "@hookstate/core";
 import { Avatar, Box, Button, TextField, Typography } from "@mui/material";
 import Axios from "axios";
 import { OpenVidu } from "openvidu-browser";
-import { useContext, useEffect, useRef, useState } from "react";
-import UserProvider from "./UserProvider";
+import { useEffect, useRef, useState } from "react";
+import { userState } from "./Store";
 import Video from "./Video";
 
-const Main = () => {
-  const user = useContext(UserProvider.context);
+const Home = () => {
+  const user = useHookstate(userState);
 
   const [newRoomName, setNewRoomName] = useState("");
   const [joinRoomId, setJoinRoomId] = useState("");
@@ -43,7 +44,7 @@ const Main = () => {
         setRooms([...rooms, newRoom]);
       })
       .catch((err) => {
-        console.log(err);
+        console.error(err);
       });
   };
 
@@ -54,7 +55,7 @@ const Main = () => {
         setRooms(rooms);
       })
       .catch((err) => {
-        console.log(err);
+        console.error(err);
       });
   };
 
@@ -65,7 +66,7 @@ const Main = () => {
         setRooms([...rooms, room]);
       })
       .catch((err) => {
-        console.log(err);
+        console.error(err);
       });
   };
 
@@ -74,7 +75,7 @@ const Main = () => {
     Axios.get(`/api/room/${roomId}/leave`)
       .then((res) => setRooms(rooms.filter((room) => room._id !== roomId)))
       .catch((err) => {
-        console.log(err);
+        console.error(err);
       });
   };
 
@@ -90,7 +91,7 @@ const Main = () => {
         );
       })
       .catch((err) => {
-        console.log(err);
+        console.error(err);
       });
   };
 
@@ -106,7 +107,7 @@ const Main = () => {
       .then((res) => {
         const room = res.data;
         setConnectedRoom(room);
-        setConnectedRoomOwned(room.owner === user._id);
+        setConnectedRoomOwned(room.owner === user.get()._id);
         setEditedRoomName(room.name);
         setMessageText("");
 
@@ -116,12 +117,12 @@ const Main = () => {
             joinSession(token);
           })
           .catch((err) => {
-            console.log(err);
+            console.error(err);
             setConnectedRoom(null);
           });
       })
       .catch((err) => {
-        console.log(err);
+        console.error(err);
         setConnectedRoom(null);
       });
   };
@@ -134,7 +135,7 @@ const Main = () => {
         setConnectedRoom(null);
       })
       .catch((err) => {
-        console.log(err);
+        console.error(err);
         setConnectedRoom(null);
       });
 
@@ -152,7 +153,7 @@ const Main = () => {
         setSelectedFiles([]);
       })
       .catch((err) => {
-        console.log(err);
+        console.error(err);
       });
   };
 
@@ -162,7 +163,7 @@ const Main = () => {
         setCurrentRecording(res.data);
       })
       .catch((err) => {
-        console.log(err);
+        console.error(err);
       });
   };
 
@@ -174,7 +175,7 @@ const Main = () => {
         setCurrentRecording(null);
       })
       .catch((err) => {
-        console.log(err);
+        console.error(err);
       });
   };
 
@@ -219,7 +220,7 @@ const Main = () => {
         setPublisher(publisher);
       })
       .catch((error) => {
-        console.log("There was an error connecting to the session:", error.code, error.message);
+        console.error("There was an error connecting to the session:", error.code, error.message);
       });
   };
 
@@ -276,7 +277,7 @@ const Main = () => {
                   variant="outlined"
                   onClick={() => connectToRoom(room._id)}
                 >
-                  {room.name + (room.owner === user._id ? " 👑" : "")}
+                  {room.name + (room.owner === user.get()._id ? " 👑" : "")}
                 </Button>
               </Box>
             ))}
@@ -341,7 +342,7 @@ const Main = () => {
           <Box flex="1" display="flex" flexDirection="column" overflow="hidden">
             <Box display="flex" flexDirection="column" flex="1" overflow="auto">
               {connectedRoom.messages.map((message) => {
-                const ownMessage = message.sender._id === user._id;
+                const ownMessage = message.sender._id === user.get()._id;
                 return (
                   <Box
                     key={message._id}
@@ -420,4 +421,4 @@ const Main = () => {
   );
 };
 
-export default Main;
+export default Home;

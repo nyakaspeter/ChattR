@@ -9,14 +9,7 @@ module.exports = function (app) {
   );
 
   app.use(
-    "/login",
-    createProxyMiddleware({
-      target: "http://localhost:5000",
-    })
-  );
-
-  app.use(
-    "/logout",
+    "/auth",
     createProxyMiddleware({
       target: "http://localhost:5000",
     })

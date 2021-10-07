@@ -1,35 +1,50 @@
+import { useHookstate } from "@hookstate/core";
 import { Box, CssBaseline } from "@mui/material";
-import { useContext } from "react";
+import axios from "axios";
+import { useEffect } from "react";
 import { BrowserRouter, Redirect, Route, Switch } from "react-router-dom";
+import AuthRoute from "./components/AuthRoute";
+import ProtectedRoute from "./components/ProtectedRoute";
+import Home from "./Home";
 import Login from "./Login";
-import Main from "./Main";
 import Menubar from "./Menubar";
-import UserProvider from "./UserProvider";
+import { userState } from "./Store";
 
 const App = () => {
-  const user = useContext(UserProvider.context);
+  const user = useHookstate(userState);
+  const userLoaded = useHookstate(false);
+
+  useEffect(() => {
+    async function fetchUserData() {
+      let userData = null;
+      try {
+        userData = (await axios.get("/api/user", { withCredentials: true })).data;
+      } catch (err) {
+        console.error(err);
+      }
+
+      user.set(userData);
+      userLoaded.set(true);
+    }
+
+    fetchUserData();
+  }, []);
 
   return (
     <BrowserRouter>
       <CssBaseline>
-        <Box display="flex" flexDirection="column" height="100vh">
-          <Menubar />
-          {user ? (
+        {userLoaded.get() && (
+          <Box display="flex" flexDirection="column" height="100vh">
+            <Menubar />
             <Switch>
-              <Route exact path="/" component={Main} />
+              <AuthRoute exact path="/login" component={Login} />
+              <ProtectedRoute exact path="/" component={Home} />
               <Route path="/">
                 <Redirect to="/" />
               </Route>
             </Switch>
-          ) : (
-            <Switch>
-              <Route exact path="/" component={Login} />
-              <Route path="/">
-                <Redirect to="/" />
-              </Route>
-            </Switch>
-          )}
-        </Box>
+          </Box>
+        )}
       </CssBaseline>
     </BrowserRouter>
   );

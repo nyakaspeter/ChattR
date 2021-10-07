@@ -5,7 +5,7 @@ const Login = () => {
     <Box display="flex" flexDirection="column" alignItems="center" m={8}>
       <Button
         variant="outlined"
-        href="/login/google"
+        href="/auth/google"
         startIcon={
           <img
             alt="google"

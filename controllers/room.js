@@ -1,7 +1,7 @@
-import Axios from "axios";
+import axios from "axios";
 import dotenv from "dotenv";
 import { OpenViduRole } from "openvidu-node-client";
-import { OV, sessions, sessionTokens } from "../config/openvidu.js";
+import openvidu, { OPENVIDU_SECRET, OPENVIDU_URL, sessions, sessionTokens } from "../config/openvidu.js";
 import Message from "../models/message.js";
 import Room from "../models/room.js";
 
@@ -46,7 +46,7 @@ export const editRoom = async (req, res) => {
 
     res.json(room);
   } catch (err) {
-    console.log(err);
+    console.error(err);
     res.status(409).json({ message: err.message });
   }
 };
@@ -59,7 +59,7 @@ export const deleteRoom = async (req, res) => {
 
     res.end();
   } catch (err) {
-    console.log(err);
+    console.error(err);
     res.status(409).json({ message: err.message });
   }
 };
@@ -75,7 +75,7 @@ export const joinRoom = async (req, res) => {
 
     res.json(room);
   } catch (err) {
-    console.log(err);
+    console.error(err);
     res.status(409).json({ message: err.message });
   }
 };
@@ -92,7 +92,7 @@ export const leaveRoom = async (req, res) => {
 
     res.end();
   } catch (err) {
-    console.log(err);
+    console.error(err);
     res.status(409).json({ message: err.message });
   }
 };
@@ -115,8 +115,8 @@ export const sendMessage = async (req, res) => {
 
     await newMessage.populate({ path: "sender", model: "User" });
 
-    await Axios.post(
-      `${process.env.OPENVIDU_URL}/openvidu/api/signal`,
+    await axios.post(
+      `${OPENVIDU_URL}/openvidu/api/signal`,
       {
         session: session.sessionId,
         type: "signal:message",
@@ -124,7 +124,7 @@ export const sendMessage = async (req, res) => {
       },
       {
         headers: {
-          Authorization: `Basic ${Buffer.from(`OPENVIDUAPP:${process.env.OPENVIDU_SECRET}`).toString("base64")}`,
+          Authorization: `Basic ${Buffer.from(`OPENVIDUAPP:${OPENVIDU_SECRET}`).toString("base64")}`,
           "Content-Type": "application/json",
         },
       }
@@ -132,7 +132,7 @@ export const sendMessage = async (req, res) => {
 
     res.status(201).end();
   } catch (err) {
-    console.log(err);
+    console.error(err);
     res.status(409).json({ message: err.message });
   }
 };
@@ -142,11 +142,11 @@ export const startRecording = async (req, res) => {
   const session = sessions[roomId];
 
   try {
-    const recording = await OV.startRecording(session.sessionId);
+    const recording = await openvidu.startRecording(session.sessionId);
 
     res.status(200).json(recording);
   } catch (err) {
-    console.log(err);
+    console.error(err);
     res.status(409).json({ message: err.message });
   }
 };
@@ -157,7 +157,7 @@ export const stopRecording = async (req, res) => {
   const session = sessions[roomId];
 
   try {
-    const recording = await OV.stopRecording(recordingId);
+    const recording = await openvidu.stopRecording(recordingId);
 
     const newMessage = new Message({
       sender: req.user._id,
@@ -169,8 +169,8 @@ export const stopRecording = async (req, res) => {
 
     await newMessage.execPopulate({ path: "sender", model: "User" });
 
-    await Axios.post(
-      `${process.env.OPENVIDU_URL}/openvidu/api/signal`,
+    await axios.post(
+      `${OPENVIDU_URL}/openvidu/api/signal`,
       {
         session: session.sessionId,
         type: "signal:message",
@@ -178,7 +178,7 @@ export const stopRecording = async (req, res) => {
       },
       {
         headers: {
-          Authorization: `Basic ${Buffer.from(`OPENVIDUAPP:${process.env.OPENVIDU_SECRET}`).toString("base64")}`,
+          Authorization: `Basic ${Buffer.from(`OPENVIDUAPP:${OPENVIDU_SECRET}`).toString("base64")}`,
           "Content-Type": "application/json",
         },
       }
@@ -186,7 +186,7 @@ export const stopRecording = async (req, res) => {
 
     res.status(200).json(recording);
   } catch (err) {
-    console.log(err);
+    console.error(err);
     res.status(409).json({ message: err.message });
   }
 };
@@ -216,7 +216,8 @@ export const connectRoom = async (req, res) => {
         res.status(409).json({ message: err.message });
       });
   } else {
-    OV.createSession()
+    openvidu
+      .createSession()
       .then((session) => {
         sessions[roomId] = session;
         sessionTokens[roomId] = [];
@@ -254,7 +255,7 @@ export const disconnectRoom = async (req, res) => {
       tokens.splice(index, 1);
     } else {
       var msg = "Problems in the app server: the TOKEN wasn't valid";
-      console.log(msg);
+      console.error(msg);
       res.status(500).send(msg);
     }
 
@@ -265,7 +266,7 @@ export const disconnectRoom = async (req, res) => {
     res.status(200).send();
   } else {
     var msg = "Problems in the app server: the SESSION does not exist";
-    console.log(msg);
+    console.error(msg);
     res.status(500).send(msg);
   }
 };

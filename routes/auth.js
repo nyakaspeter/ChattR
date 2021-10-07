@@ -4,14 +4,14 @@ import passport from "../config/passport.js";
 const router = express.Router();
 
 router.get(
-  "/login/google",
+  "/google",
   passport.authenticate("google", {
     scope: ["profile", "email"],
     prompt: "select_account",
   })
 );
 
-router.get("/login/google/callback", passport.authenticate("google"), (req, res) => {
+router.get("/google/callback", passport.authenticate("google"), (req, res) => {
   res.redirect("/");
 });
 
