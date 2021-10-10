@@ -5,8 +5,7 @@
   "type": "module",
   "scripts": {
     "start": "node index.js",
-    "dev": "nodemon index.js",
-    "dev-all": "concurrently \"yarn dev\" \"yarn --cwd client start\""
+    "dev": "concurrently \"nodemon index.js\" \"yarn --cwd client start\""
   },
   "license": "MIT",
   "dependencies": {

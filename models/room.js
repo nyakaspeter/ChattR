@@ -17,6 +17,12 @@ const roomSchema = mongoose.Schema({
       ref: "User",
     },
   ],
+  usersWhoLeft: [
+    {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+    },
+  ],
   messages: [Message.schema],
 });
 
