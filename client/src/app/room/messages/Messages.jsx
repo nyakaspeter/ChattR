@@ -23,8 +23,8 @@ const Messages = (props) => {
   };
 
   return (
-    <Box flex="1" display="flex" flexDirection="column" overflow="hidden">
-      <Box display="flex" flexDirection="column" flex="1" overflow="auto">
+    <Box display="flex" flexDirection="column">
+      <Box display="flex" flexDirection="column" overflow="auto" height="600px">
         {store.messages.get().map((message, idx) => {
           const ownMessage = message.sender === store.user._id.get();
           return (
@@ -55,7 +55,7 @@ const Messages = (props) => {
           );
         })}
       </Box>
-      <Box display="flex" mt={2}>
+      <Box display="flex">
         <TextField
           fullWidth
           variant="outlined"

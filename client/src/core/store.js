@@ -9,4 +9,6 @@ export const globalStore = createState({
   token: null,
   localStream: null,
   remoteStreams: [],
+  onlineUsers: [],
+  recording: false,
 });

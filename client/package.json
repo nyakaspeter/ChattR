@@ -8,6 +8,7 @@
     "@hookstate/core": "^3.0.13",
     "@hookstate/persistence": "^3.0.0",
     "@mui/icons-material": "^5.0.1",
+    "@mui/lab": "^5.0.0-alpha.50",
     "@mui/material": "^5.0.2",
     "axios": "^0.22.0",
     "http-proxy-middleware": "^2.0.1",

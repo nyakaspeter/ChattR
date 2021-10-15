@@ -1,47 +1,35 @@
 import { useHookstate } from "@hookstate/core";
-import { Button, TextField, Typography } from "@mui/material";
+import { ArrowBack } from "@mui/icons-material";
+import { Button, IconButton, Stack, TextField, Typography } from "@mui/material";
 import { Box } from "@mui/system";
+import { Link, useHistory } from "react-router-dom";
+import { api } from "../../core/api";
 import { globalStore } from "../../core/store";
 
 const RoomInfo = (props) => {
+  const history = useHistory();
   const store = useHookstate(globalStore);
   const roomNameInput = useHookstate(store.room.name.get());
   const roomOwned = store.room.owner.get() === store.user._id.get();
 
-  const editRoom = () => {
-    // Axios.put(`/api/room/${room.get()._id}`, { name: roomNameInput.get() })
-    //   .then((res) => {
-    //     room.set(res.data);
-    //     setRooms(
-    //       rooms.map((room) => {
-    //         if (room._id === res.data._id) return res.data;
-    //         else return room;
-    //       })
-    //     );
-    //   })
-    //   .catch((err) => {
-    //     console.error(err);
-    //   });
+  const updateRoom = async () => {
+    await api.post(`room/${store.room._id.get()}/update`, { name: roomNameInput.get() });
   };
 
-  const leaveRoom = (roomId) => {
-    // disconnectFromRoom();
-    // Axios.get(`/api/room/${roomId}/leave`)
-    //   .then((res) => setRooms(rooms.filter((room) => room._id !== roomId)))
-    //   .catch((err) => {
-    //     console.error(err);
-    //   });
+  const leaveRoom = async () => {
+    await api.get(`room/${store.room._id.get()}/leave`);
+    history.push("/");
   };
 
-  const deleteRoom = () => {
-    // Axios.delete(`/api/room/${room.get()._id}`).then((res) => {
-    //   setRooms(rooms.filter((room) => room._id !== room.get()._id));
-    //   setConnectedRoom(null);
-    // });
+  const deleteRoom = async () => {
+    await api.get(`room/${store.room._id.get()}/delete`);
   };
 
   return (
-    <Box display="flex">
+    <Stack direction="row">
+      <IconButton component={Link} to="/">
+        <ArrowBack />
+      </IconButton>
       <Box flex="1" display="flex" flexDirection="column">
         <Typography variant="h5">{store.room.name.get() + (roomOwned ? " 👑" : "")}</Typography>
         <Typography variant="subtitle2">{store.room._id.get()}</Typography>
@@ -55,7 +43,7 @@ const RoomInfo = (props) => {
             value={roomNameInput.get()}
             onChange={(e) => roomNameInput.set(e.target.value)}
           />
-          <Button onClick={editRoom} variant="outlined">
+          <Button onClick={updateRoom} variant="outlined">
             Save
           </Button>
           <Button onClick={deleteRoom} variant="outlined">
@@ -73,14 +61,10 @@ const RoomInfo = (props) => {
         </Box>
       )}
 
-      <Button onClick={() => leaveRoom(store.room._id.get())} variant="outlined">
+      <Button onClick={leaveRoom} variant="outlined">
         Leave
       </Button>
-
-      {/* <Button onClick={disconnectFromRoom} variant="outlined">
-        Disconnect
-      </Button> */}
-    </Box>
+    </Stack>
   );
 };
 

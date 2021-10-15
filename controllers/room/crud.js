@@ -1,4 +1,5 @@
 import dotenv from "dotenv";
+import { ovApi, sessions } from "../../config/openvidu.js";
 import Room from "../../models/room.js";
 
 dotenv.config();
@@ -31,16 +32,18 @@ export const createRoom = async (req, res) => {
 };
 
 export const updateRoom = async (req, res) => {
-  const editedRoom = req.body;
   const roomId = req.params.roomId;
 
   try {
-    const room = await Room.findByIdAndUpdate(roomId, { name: editedRoom.name }, { new: true }).populate({
-      path: "messages.sender",
-      model: "User",
+    const room = await Room.findByIdAndUpdate(roomId, req.body, { new: true, select: "-users -messages" });
+
+    await ovApi.post("signal", {
+      session: roomId,
+      type: "signal:roomUpdated",
+      data: JSON.stringify(room),
     });
 
-    res.json(room);
+    res.end();
   } catch (err) {
     console.error(err);
     res.status(409).json({ message: err.message });
@@ -51,51 +54,14 @@ export const deleteRoom = async (req, res) => {
   const roomId = req.params.roomId;
 
   try {
+    await ovApi.post("signal", {
+      session: roomId,
+      type: "signal:roomDeleted",
+    });
+
+    if (sessions[roomId]) await sessions[roomId].close();
+
     await Room.findByIdAndRemove(roomId);
-
-    res.end();
-  } catch (err) {
-    console.error(err);
-    res.status(409).json({ message: err.message });
-  }
-};
-
-export const enterRoom = async (req, res) => {
-  const roomId = req.params.roomId;
-
-  try {
-    const room = await Room.findByIdAndUpdate(
-      roomId,
-      { $addToSet: { users: req.user._id } },
-      { new: true, select: "-messages" }
-    )
-      .populate({
-        path: "users",
-        model: "User",
-        select: "name picture email",
-      })
-      .populate({
-        path: "usersWhoLeft",
-        model: "User",
-        select: "name picture",
-      });
-
-    res.json(room);
-  } catch (err) {
-    console.error(err);
-    res.status(409).json({ message: err.message });
-  }
-};
-
-export const leaveRoom = async (req, res) => {
-  const roomId = req.params.roomId;
-
-  try {
-    const room = await Room.findById(roomId);
-
-    if (room.owner.equals(req.user._id)) throw new Error("It's not possible to leave your own room");
-
-    await Room.findByIdAndUpdate(roomId, { $pull: { users: req.user._id } });
 
     res.end();
   } catch (err) {

@@ -15,7 +15,7 @@ const Menubar = () => {
 
           {authenticated && (
             <Box display="flex" alignItems="center">
-              <Avatar style={{ marginRight: 16 }} src={store.user.picture.get()} />
+              <Avatar style={{ marginRight: 16 }} src={store.user.picture.get()} referrerPolicy="no-referrer" />
               <Typography style={{ marginRight: 16 }}>{store.user.name.get()}</Typography>
               <IconButton href="/auth/logout" size="large">
                 <ExitToApp style={{ color: "white" }} />
