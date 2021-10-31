@@ -1,0 +1,37 @@
+{
+    // See https://go.microsoft.com/fwlink/?LinkId=733558
+    // for the documentation about the tasks.json format
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "Start (dev)",
+            "dependsOn": [
+                "Start server (dev)",
+                "Start client (dev)"
+            ],
+            "problemMatcher": []
+        },
+        {
+            "label": "Start server (dev)",
+            "type": "shell",
+            "command": "yarn workspace server dev",
+            "presentation": {
+                "group": "dev",
+                "reveal": "always",
+                "panel": "shared"
+            },
+            "problemMatcher": []
+        },
+        {
+            "label": "Start client (dev)",
+            "type": "shell",
+            "command": "yarn workspace client start",
+            "presentation": {
+                "group": "dev",
+                "reveal": "always",
+                "panel": "shared"
+            },
+            "problemMatcher": []
+        },
+    ]
+}

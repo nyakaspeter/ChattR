@@ -1,0 +1,18 @@
+{
+  "name": "chattr",
+  "version": "1.0.0",
+  "description": "Experimental chat app powered by WebSockets & WebRTC",
+  "main": "index.js",
+  "author": "Nyakas Péter",
+  "private": true,
+  "scripts": {
+    "dev": "concurrently \"yarn workspace server dev\" \"yarn workspace client start\""
+  },
+  "workspaces": [
+    "client",
+    "server"
+  ],
+  "devDependencies": {
+    "concurrently": "^6.3.0"
+  }
+}
