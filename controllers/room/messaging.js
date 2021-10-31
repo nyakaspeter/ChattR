@@ -1,4 +1,5 @@
-import { ovApi } from "../../config/openvidu.js";
+import mongoose from "../../config/mongoose.js";
+import socketio from "../../config/socketio.js";
 import Room from "../../models/room.js";
 
 export const getMessages = async (req, res) => {
@@ -21,18 +22,23 @@ export const sendMessage = async (req, res) => {
 
   try {
     const newMessage = {
+      _id: new mongoose.Types.ObjectId(),
       sender: req.user._id,
       date: new Date(),
       text: message.text,
       files: files,
     };
 
-    await Room.findByIdAndUpdate(roomId, { $push: { messages: newMessage } });
+    const room = await Room.findByIdAndUpdate(roomId, { $push: { messages: newMessage } });
 
-    await ovApi.post("signal", {
-      session: roomId,
-      type: "signal:message",
-      data: JSON.stringify(newMessage),
+    const { email, ...senderProps } = req.user;
+
+    room.users.forEach((u) => {
+      socketio.emitToUser(u._id, "message", {
+        roomId,
+        sender: { ...senderProps },
+        message: newMessage,
+      });
     });
 
     res.status(201).end();
