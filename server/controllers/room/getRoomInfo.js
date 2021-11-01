@@ -9,7 +9,7 @@ export const getRoomInfo = async (req, res) => {
       .populate({
         path: 'users',
         model: 'User',
-        select: 'name picture email',
+        select: 'name picture email online',
       })
       .populate({
         path: 'usersWhoLeft',

@@ -60,7 +60,9 @@ const RoomHeader = props => {
           <Badge>
             {room.users.length} {room.users.length === 1 ? 'user' : 'users'}
           </Badge>
-          <Badge colorScheme="green">{room.users.length} online</Badge>
+          <Badge colorScheme="green">
+            {room.users.filter(u => u.online).length} online
+          </Badge>
         </VStack>
         <IconButton borderRadius="3xl">
           <MdCall size={20} />

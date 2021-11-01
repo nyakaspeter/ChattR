@@ -96,7 +96,7 @@ const RoomJoin = props => {
             <Heading fontSize="3xl">{room.name}</Heading>
             <HStack>
               <Badge>{room.userCount} users</Badge>
-              <Badge colorScheme="green">{room.userCount} online</Badge>
+              <Badge colorScheme="green">{room.onlineUserCount} online</Badge>
             </HStack>
             {room.description && (
               <Text whiteSpace="pre-line">{room.description}</Text>

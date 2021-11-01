@@ -10,8 +10,9 @@ export const getRooms = async (req, res) => {
     const rooms = await Room.find(
       { users: userId },
       { messages: { $slice: -1 } },
-      { select: 'name image owner lastActivity' }
+      { select: 'name image owner users lastActivity' }
     )
+      .populate({ path: 'users', model: 'User', select: 'online' })
       .populate({
         path: 'messages.sender',
         model: 'User',
@@ -21,8 +22,12 @@ export const getRooms = async (req, res) => {
 
     return res.json(
       rooms.map(room => {
-        const { messages, ...rest } = room;
-        return { ...rest, lastMessage: messages[0] || null };
+        const { users, messages, ...rest } = room;
+        return {
+          ...rest,
+          onlineUserCount: users.filter(u => u.online).length,
+          lastMessage: messages[0] || null,
+        };
       })
     );
   } catch (err) {

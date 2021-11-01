@@ -19,6 +19,9 @@ const userSchema = mongoose.Schema({
     type: String,
     required: false,
   },
+  online: {
+    type: Boolean,
+  },
 });
 
 const User = mongoose.model('User', userSchema);

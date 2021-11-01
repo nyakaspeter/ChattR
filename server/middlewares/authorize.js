@@ -38,7 +38,9 @@ export const authorize = level => async (req, res, next) => {
     const room = await Room.findById(
       roomId,
       'name description image privacy users usersWhoRequestedToJoin'
-    ).lean();
+    )
+      .populate({ path: 'users', model: 'User', select: 'online' })
+      .lean();
 
     const requested = room.usersWhoRequestedToJoin.find(id =>
       id.equals(userId)
@@ -50,6 +52,7 @@ export const authorize = level => async (req, res, next) => {
       description: room.description,
       privacy: room.privacy,
       userCount: room.users.length,
+      onlineUserCount: room.users.filter(u => u.online).length,
       hasImage: !!room.image,
       status: requested ? 'requestedToJoin' : 'notMember',
     });

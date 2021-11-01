@@ -1,4 +1,4 @@
-import { Avatar } from '@chakra-ui/avatar';
+import { Avatar, AvatarBadge } from '@chakra-ui/avatar';
 import { useColorModeValue } from '@chakra-ui/color-mode';
 import { Flex, HStack, Text, VStack } from '@chakra-ui/layout';
 import React from 'react';
@@ -25,7 +25,11 @@ const RoomListItem = props => {
         <Avatar
           name={room.name}
           src={room.image && `/api/room/${room._id}/image`}
-        />
+        >
+          {room.onlineUserCount > 1 && (
+            <AvatarBadge boxSize={4} bg="green.400" />
+          )}
+        </Avatar>
         <VStack align="start" spacing={0}>
           <Text fontWeight="bold" noOfLines="1" wordBreak="break-all">
             {room.name}
