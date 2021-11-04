@@ -1,125 +1,57 @@
-import { VStack } from '@chakra-ui/layout';
-import { Fade } from '@chakra-ui/transition';
-import React from 'react';
-import { useBeforeunload } from 'react-beforeunload';
-import { useQuery } from 'react-query';
-import { getMessages, getRoom, getSessionToken } from '../../../core/api';
-import { openvidu } from '../../../core/openvidu';
-import MessageForm from '../message/MessageForm';
-import MessageList from '../message/MessageList';
+import { HStack, VStack } from '@chakra-ui/layout';
+import React, { useEffect, useState } from 'react';
+import { Redirect, useParams } from 'react-router';
+import { useRoom } from '../../../core/api';
+import Messages from '../message/Messages';
+import SidePanel from '../sidepanel/SidePanel';
 import RoomHeader from './RoomHeader';
 import RoomJoin from './RoomJoin';
 
-const sessionQueryOptions = {
-  refetchOnWindowFocus: false,
-  refetchOnmount: false,
-  refetchOnReconnect: false,
-  retry: false,
-  staleTime: Infinity,
-};
-
 const Room = props => {
-  const { roomId, ...rest } = props;
+  const { roomId } = useParams();
 
-  const room = useQuery(['room', roomId], () => getRoom(roomId), {
-    retry: (failureCount, error) =>
-      failureCount < 3 && error.response.status !== 403,
-  });
+  const room = useRoom(roomId);
 
-  const messages = useQuery(['messages', roomId], () => getMessages(roomId), {
-    enabled: room.isSuccess,
-  });
+  const [panel, setPanel] = useState(null);
+  const [inCall, setInCall] = useState(false);
 
-  // const session = useQuery(
-  //   ['session', roomId],
-  //   () => connectToSession(),
-  //   sessionQueryOptions
-  // );
+  const handleOpenPanel = panel => setPanel(panel);
+  const handleClosePanel = () => setPanel(null);
 
-  async function connectToSession() {
-    const token = await getSessionToken(roomId);
-    const session = openvidu.initSession();
+  useEffect(() => {
+    // Close sidepanel on switching room
 
-    session.on('connectionCreated', event => {
-      //store.onlineUsers.merge([event.connection.data]);
-    });
-
-    session.on('connectionDestroyed', event => {
-      //store.onlineUsers.set((users) => users.filter((user) => user !== event.connection.data));
-    });
-
-    session.on('streamCreated', event => {
-      //const stream = session.current.subscribe(event.stream, undefined);
-      //store.remoteStreams.merge([stream]);
-    });
-
-    session.on('streamDestroyed', event => {
-      //const idx = store.remoteStreams.attach(Downgraded).get().indexOf(event.stream.streamManager);
-      //store.remoteStreams[idx].set(none);
-    });
-
-    session.on('recordingStarted', event => {
-      //store.recording.set(true);
-    });
-
-    session.on('recordingStopped', event => {
-      //store.recording.set(false);
-    });
-
-    session.on('signal:message', event => {
-      //const message = JSON.parse(event.data);
-      //store.messages.merge([message]);
-    });
-
-    session.on('signal:roomUpdated', event => {
-      //const room = JSON.parse(event.data);
-      //store.room.merge(room);
-    });
-
-    session.on('signal:roomDeleted', event => {
-      //history.push("/");
-    });
-
-    await session.connect(token);
-
-    return session;
-  }
-
-  function disconnectFromSession() {
-    //session.current.disconnect();
-  }
-
-  useBeforeunload(event => {
-    //disconnectFromSession();
-  });
-
-  if (room.isLoading && !room.error?.response?.data) return null;
-
-  if (room.isError || room.error?.response?.data)
-    return (
-      <>
-        {room.error?.response?.data && (
-          <RoomJoin {...rest} room={room.error.response.data} />
-        )}
-      </>
-    );
+    setPanel(null);
+  }, [room.data]);
 
   return (
-    <VStack {...rest} alignItems="stretch" spacing={0}>
-      <RoomHeader room={room.data} />
-
-      {messages.isSuccess && (
+    <HStack {...props} alignItems="stretch">
+      {room.isSuccess && (
         <>
-          <MessageList
-            flex="1"
-            room={room.data}
-            messages={messages.data}
-            users={[...room.data.users, ...room.data.usersWhoLeft]}
-          />
-          <MessageForm room={room.data} />
+          <VStack flex="2" alignItems="stretch" spacing={0}>
+            <RoomHeader room={room.data} onOpenPanel={handleOpenPanel} />
+            <Messages flex="1" room={room.data} />
+          </VStack>
+
+          {panel && (
+            <SidePanel
+              flex="1"
+              maxWidth="360px"
+              borderLeftWidth="1px"
+              title={panel.title}
+              content={panel.content}
+              onClose={handleClosePanel}
+            />
+          )}
         </>
       )}
-    </VStack>
+
+      {room.error?.response?.data && (
+        <RoomJoin flex="1" room={room.error.response.data} />
+      )}
+
+      {room.isError && !room.error?.response?.data && <Redirect to="/r" />}
+    </HStack>
   );
 };
 

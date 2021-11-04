@@ -2,6 +2,7 @@ import dotenv from 'dotenv';
 import mongoose from 'mongoose';
 import multer from 'multer';
 import { GridFsStorage } from 'multer-gridfs-storage';
+import User from '../models/user.js';
 
 dotenv.config();
 
@@ -14,10 +15,12 @@ export let gfs;
 
 mongoose.connect(MONGODB_URL).catch(err => console.error(err));
 
-mongoose.connection.once('open', () => {
+mongoose.connection.once('open', async () => {
   gfs = new mongoose.mongo.GridFSBucket(mongoose.connection.db, {
     bucketName: UPLOAD_BUCKET_NAME,
   });
+
+  await User.updateMany({}, { online: false });
 });
 
 const storage = new GridFsStorage({

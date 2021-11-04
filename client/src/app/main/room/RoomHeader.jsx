@@ -1,7 +1,7 @@
 import { Avatar } from '@chakra-ui/avatar';
 import { IconButton } from '@chakra-ui/button';
 import { useDisclosure } from '@chakra-ui/hooks';
-import { Badge, Box, Heading, HStack, VStack } from '@chakra-ui/layout';
+import { Badge, Box, Heading, HStack, Text, VStack } from '@chakra-ui/layout';
 import {
   Menu,
   MenuButton,
@@ -11,21 +11,26 @@ import {
 } from '@chakra-ui/menu';
 import { Fade } from '@chakra-ui/transition';
 import React from 'react';
-import { BsThreeDots } from 'react-icons/bs';
+import { BsRecordFill, BsThreeDots } from 'react-icons/bs';
 import { HiChatAlt2 } from 'react-icons/hi';
 import { ImExit } from 'react-icons/im';
-import { IoMdPeople } from 'react-icons/io';
+import { IoMdInformationCircle, IoMdPeople } from 'react-icons/io';
 import { MdCall, MdDelete, MdEdit } from 'react-icons/md';
-import { useAuth } from '../../../core/api';
+import { useUser } from '../../../core/api';
+import Messages from '../message/Messages';
 import CreateOrEditRoomModal from '../modals/CreateOrEditRoomModal';
 import DeleteRoomModal from '../modals/DeleteRoomModal';
 import LeaveRoomModal from '../modals/LeaveRoomModal';
+import RoomDetails from './RoomDetails';
+import RoomUsers from './RoomUsers';
 
 const RoomHeader = props => {
-  const { room, ...rest } = props;
+  const { room, onOpenPanel, ...rest } = props;
 
-  const user = useAuth();
+  const user = useUser();
   const own = user.data._id === room.owner;
+
+  const inCall = false;
 
   const {
     isOpen: editRoomModalIsOpen,
@@ -45,6 +50,25 @@ const RoomHeader = props => {
     onClose: closeDeleteRoomModal,
   } = useDisclosure();
 
+  const handleOpenCallPanel = () => {
+    onOpenPanel({ title: 'Call' });
+  };
+
+  const handleOpenMessagesPanel = () => {
+    onOpenPanel({
+      title: 'Messages',
+      content: <Messages flex="1" room={room} />,
+    });
+  };
+
+  const handleOpenUsersPanel = () => {
+    onOpenPanel({ title: 'Users', content: <RoomUsers room={room} /> });
+  };
+
+  const handleOpenDetailsPanel = () => {
+    onOpenPanel({ title: 'Details', content: <RoomDetails room={room} /> });
+  };
+
   return (
     <Fade in>
       <HStack {...rest} p={3} spacing={3}>
@@ -57,24 +81,49 @@ const RoomHeader = props => {
         </Heading>
         <Box flex="1" />
         <VStack spacing={1} alignItems="flex-end">
-          <Badge>
-            {room.users.length} {room.users.length === 1 ? 'user' : 'users'}
-          </Badge>
+          <Badge>{room.users.length} users</Badge>
           <Badge colorScheme="green">
             {room.users.filter(u => u.online).length} online
           </Badge>
         </VStack>
-        <IconButton borderRadius="3xl">
-          <MdCall size={20} />
-        </IconButton>
-        <IconButton borderRadius="3xl">
-          <HiChatAlt2 size={20} />
-        </IconButton>
-        <IconButton borderRadius="3xl">
+        {!inCall && (
+          <IconButton onClick={handleOpenCallPanel} borderRadius="full">
+            <MdCall size={20} />
+          </IconButton>
+        )}
+        {inCall && (
+          <>
+            <IconButton
+              onClick={handleOpenCallPanel}
+              borderRadius="full"
+              p={3}
+              colorScheme="red"
+            >
+              <HStack>
+                <MdCall size={20} />
+                <Text>14:15</Text>
+              </HStack>
+            </IconButton>
+            {/* <IconButton
+              onClick={handleOpenMessagesPanel}
+              borderRadius="full"
+              color="red.500"
+            >
+              <BsRecordFill size={20} />
+            </IconButton> */}
+            <IconButton onClick={handleOpenMessagesPanel} borderRadius="full">
+              <HiChatAlt2 size={20} />
+            </IconButton>
+          </>
+        )}
+        <IconButton onClick={handleOpenUsersPanel} borderRadius="full">
           <IoMdPeople size={20} />
         </IconButton>
+        <IconButton onClick={handleOpenDetailsPanel} borderRadius="full">
+          <IoMdInformationCircle size={20} />
+        </IconButton>
         <Menu>
-          <IconButton as={MenuButton} borderRadius="3xl" p={2.5}>
+          <IconButton as={MenuButton} borderRadius="full" p={2.5}>
             <BsThreeDots size={20} />
           </IconButton>
           <MenuList>

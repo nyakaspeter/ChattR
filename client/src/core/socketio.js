@@ -25,7 +25,7 @@ export async function wsConnect() {
   });
 
   socket.on('message', async e => {
-    const queryKey = ['messages', e.roomId];
+    const queryKey = ['room', e.roomId, 'messages'];
     await queryClient.cancelQueries(queryKey);
 
     queryClient.setQueryData(queryKey, old => {

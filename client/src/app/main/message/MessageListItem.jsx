@@ -1,7 +1,8 @@
 import { Avatar } from '@chakra-ui/avatar';
 import { Button } from '@chakra-ui/button';
 import { useColorModeValue } from '@chakra-ui/color-mode';
-import { Center, HStack, SimpleGrid, Text, VStack } from '@chakra-ui/layout';
+import { DownloadIcon } from '@chakra-ui/icons';
+import { HStack, SimpleGrid, Text, VStack } from '@chakra-ui/layout';
 import React from 'react';
 import { FaRegFile } from 'react-icons/fa';
 
@@ -47,22 +48,36 @@ const MessageListItem = props => {
             overflowY="auto"
             overflowX="hidden"
           >
-            {message.files.map((file, i) => (
-              <Button
-                as="a"
-                href={`/api/room/${roomId}/message/${message._id}/files/${file.id}/download`}
-                key={i}
+            {message.files.map(file => (
+              <HStack
+                key={file.id}
+                p={2.5}
                 bg={fileBg}
-                p={3}
                 borderRadius="md"
+                flex="1"
               >
-                <HStack maxW="100%">
-                  <FaRegFile size={20} />
-                  <Text fontSize="sm" isTruncated>
-                    {file.originalname}
-                  </Text>
-                </HStack>
-              </Button>
+                <FaRegFile size={20} />
+                <Text
+                  fontWeight="semibold"
+                  fontSize="sm"
+                  noOfLines="1"
+                  wordBreak="break-all"
+                  textOverflow="ellipsis"
+                  flex="1"
+                >
+                  {file.originalname}
+                </Text>
+                <Button
+                  as="a"
+                  href={`/api/room/${roomId}/message/${message._id}/files/${file.id}/download`}
+                  size="xs"
+                  borderRadius="full"
+                  colorScheme="blue"
+                  p={0}
+                >
+                  <DownloadIcon fontSize="xs" />
+                </Button>
+              </HStack>
             ))}
           </SimpleGrid>
         )}

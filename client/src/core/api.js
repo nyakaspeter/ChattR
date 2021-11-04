@@ -49,7 +49,7 @@ export async function getSessionToken(roomId) {
   return (await api.get(`room/${roomId}/token`)).data;
 }
 
-export const useAuth = () => {
+export const useUser = () => {
   const queryOptions = {
     refetchOnWindowFocus: false,
     refetchOnmount: false,
@@ -60,3 +60,17 @@ export const useAuth = () => {
 
   return useQuery('user', () => getUser(), queryOptions);
 };
+
+export const useRooms = () => useQuery('rooms', () => getRooms());
+
+export const useRoom = roomId =>
+  useQuery(['room', roomId], () => getRoom(roomId), {
+    enabled: !!roomId,
+    retry: (failureCount, error) =>
+      failureCount < 3 &&
+      error.response?.status !== 403 &&
+      error.response?.status !== 404,
+  });
+
+export const useMessages = roomId =>
+  useQuery(['room', roomId, 'messages'], () => getMessages(roomId));

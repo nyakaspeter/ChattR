@@ -3,16 +3,17 @@ import { Input, InputGroup, InputLeftElement } from '@chakra-ui/input';
 import { Box, VStack } from '@chakra-ui/layout';
 import { Fade } from '@chakra-ui/transition';
 import React, { useMemo, useState } from 'react';
-import { useQuery } from 'react-query';
 import { Redirect, useParams } from 'react-router';
 import { ScrollView } from '../../../components/ScrollView';
-import { getRooms } from '../../../core/api';
+import { useRooms } from '../../../core/api';
 import RoomListHeader from './RoomListHeader';
 import RoomListItem from './RoomListItem';
 
 const RoomList = props => {
   const { roomId: currentRoomId } = useParams();
-  const rooms = useQuery('rooms', () => getRooms());
+
+  const rooms = useRooms();
+
   const [filter, setFilter] = useState('');
 
   const filteredRooms = useMemo(
@@ -41,7 +42,7 @@ const RoomList = props => {
               <Input
                 value={filter}
                 onChange={e => setFilter(e.target.value)}
-                borderRadius="3xl"
+                borderRadius="full"
                 variant="filled"
                 placeholder="Search rooms"
               />
@@ -51,9 +52,9 @@ const RoomList = props => {
           <ScrollView>
             <Fade in>
               <VStack px={2} alignItems="stretch" overflow="auto">
-                {filteredRooms.map((room, i) => (
+                {filteredRooms.map(room => (
                   <RoomListItem
-                    key={i}
+                    key={room._id}
                     room={room}
                     selected={room._id === currentRoomId}
                   />

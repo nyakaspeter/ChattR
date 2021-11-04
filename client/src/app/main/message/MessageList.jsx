@@ -1,16 +1,18 @@
 import { IconButton } from '@chakra-ui/button';
 import { ArrowDownIcon } from '@chakra-ui/icons';
-import { VStack } from '@chakra-ui/layout';
+import { Box, VStack } from '@chakra-ui/layout';
 import { Fade } from '@chakra-ui/transition';
 import React, { useEffect, useRef, useState } from 'react';
 import { ScrollView } from '../../../components/ScrollView';
-import { useAuth } from '../../../core/api';
+import { useMessages, useUser } from '../../../core/api';
 import MessageListItem from './MessageListItem';
 
 const MessageList = props => {
-  const { room, messages, users, ...rest } = props;
+  const { room, ...rest } = props;
+  const roomUsers = [...room.users, ...room.usersWhoLeft];
 
-  const user = useAuth();
+  const user = useUser();
+  const messages = useMessages(room._id);
 
   const [canScrollDown, setCanScrollDown] = useState(false);
   const scrollbar = useRef();
@@ -44,35 +46,39 @@ const MessageList = props => {
   useEffect(() => {
     // Scroll to bottom on new message, if already was scrolled to bottom
 
-    const lastMessage = messages[messages.length - 1];
+    if (!messages.data) return;
+
+    const lastMessage = messages.data[messages.data.length - 1];
 
     if (lastMessage?._id !== lastMessageId.current && !canScrollDown) {
       scrollToBottom();
     }
 
     lastMessageId.current = lastMessage?._id;
-  }, [messages, canScrollDown]);
+  }, [messages.data, canScrollDown]);
+
+  if (!messages.isSuccess) return <VStack {...rest} />;
 
   return (
     <VStack {...rest} position="relative">
       <ScrollView ref={scrollbar} onScrollFrame={handleScroll}>
         <Fade in>
           <VStack p={2}>
-            {messages.map((message, i) => {
+            {messages.data.map((message, i) => {
               const own = message.sender === user.data._id;
               const lastMessageBySender =
-                messages[i + 1]?.sender !== message.sender;
+                messages.data[i + 1]?.sender !== message.sender;
 
               return (
                 <MessageListItem
-                  key={i}
+                  key={message._id}
                   roomId={room._id}
                   message={message}
                   own={own}
                   alignSelf={own ? 'flex-end' : 'flex-start'}
                   maxW="80%"
                   showAvatar={lastMessageBySender}
-                  sender={users?.find(u => u._id === message.sender)}
+                  sender={roomUsers?.find(u => u._id === message.sender)}
                 />
               );
             })}
@@ -83,7 +89,7 @@ const MessageList = props => {
         <IconButton
           position="absolute"
           bottom={2}
-          borderRadius="3xl"
+          borderRadius="full"
           colorScheme="blue"
           onClick={scrollToBottom}
         >

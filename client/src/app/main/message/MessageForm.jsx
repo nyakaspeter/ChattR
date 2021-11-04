@@ -1,9 +1,10 @@
 import { Button, IconButton } from '@chakra-ui/button';
 import { useColorModeValue } from '@chakra-ui/color-mode';
-import { ChatIcon, CloseIcon } from '@chakra-ui/icons';
+import { ChatIcon, CloseIcon, DeleteIcon } from '@chakra-ui/icons';
 import {
   Box,
   Center,
+  Flex,
   HStack,
   SimpleGrid,
   Text,
@@ -14,7 +15,7 @@ import { Fade } from '@chakra-ui/transition';
 import React, { useRef, useState } from 'react';
 import { BiSend } from 'react-icons/bi';
 import { FaRegFile } from 'react-icons/fa';
-import { MdAttachFile } from 'react-icons/md';
+import { MdAttachFile, MdDelete } from 'react-icons/md';
 import ResizeTextarea from 'react-textarea-autosize';
 import { sendMessage } from '../../../core/api';
 
@@ -106,7 +107,7 @@ const MessageForm = props => {
                 onClick={handleBrowseFiles}
                 color="gray.500"
                 bg="transparent"
-                borderRadius="3xl"
+                borderRadius="full"
               >
                 <MdAttachFile size={24} />
               </IconButton>
@@ -114,7 +115,7 @@ const MessageForm = props => {
                 onClick={handleSendMessage}
                 color="gray.500"
                 bg="transparent"
-                borderRadius="3xl"
+                borderRadius="full"
               >
                 <BiSend size={24} />
               </IconButton>
@@ -137,32 +138,35 @@ const MessageForm = props => {
             overflowY="auto"
             overflowX="hidden"
           >
-            {files.map((file, i) => (
-              <Button
-                position="relative"
-                key={i}
+            {files.map(file => (
+              <HStack
+                key={file.name}
+                p={2.5}
                 bg={fileBg}
-                p={3}
                 borderRadius="md"
                 flex="1"
               >
-                <IconButton
-                  position="absolute"
-                  top={0}
-                  right={0}
+                <FaRegFile size={20} />
+                <Text
+                  fontWeight="semibold"
+                  fontSize="sm"
+                  noOfLines="1"
+                  wordBreak="break-all"
+                  textOverflow="ellipsis"
+                  flex="1"
+                >
+                  {file.name}
+                </Text>
+                <Button
                   size="xs"
-                  variant="ghost"
+                  borderRadius="full"
+                  colorScheme="red"
+                  p={0}
                   onClick={() => handleUnselectFile(file)}
                 >
-                  <CloseIcon fontSize="xs" />
-                </IconButton>
-                <HStack maxW="100%">
-                  <FaRegFile size={20} />
-                  <Text fontSize="sm" isTruncated>
-                    {file.name}
-                  </Text>
-                </HStack>
-              </Button>
+                  <CloseIcon fontSize={10} />
+                </Button>
+              </HStack>
             ))}
           </SimpleGrid>
         )}

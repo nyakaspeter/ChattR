@@ -38,12 +38,12 @@ const RoomListHeader = props => {
         <HStack spacing={3}>
           <IconButton
             onClick={openCreateRoomModal}
-            borderRadius="3xl"
+            borderRadius="full"
             aria-label=""
             icon={<AddIcon />}
           ></IconButton>
           <Menu>
-            <IconButton as={MenuButton} borderRadius="3xl">
+            <IconButton as={MenuButton} borderRadius="full">
               <HamburgerIcon />
             </IconButton>
             <MenuList>

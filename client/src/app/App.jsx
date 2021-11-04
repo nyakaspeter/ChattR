@@ -3,20 +3,17 @@ import { Spinner } from '@chakra-ui/spinner';
 import React from 'react';
 import { Redirect } from 'react-router';
 import { Route, Switch } from 'react-router-dom';
-import { useAuth } from '../core/api';
+import { Loading } from '../components/Loading';
+import { useUser } from '../core/api';
 import Login from './login/Login';
 import Main from './main/Main';
 import Register from './register/Register';
 
 const App = () => {
-  const user = useAuth();
+  const user = useUser();
 
   if (user.isLoading) {
-    return (
-      <Center h="100vh">
-        <Spinner size="lg" />
-      </Center>
-    );
+    return <Loading fullscreen />;
   }
 
   if (user.isError) {

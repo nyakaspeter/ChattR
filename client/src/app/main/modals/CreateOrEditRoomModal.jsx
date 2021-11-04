@@ -196,12 +196,12 @@ const CreateOrEditRoomModal = props => {
                   w="100%"
                   h="100%"
                   bg={avatarOptionsBgColor}
-                  borderRadius={100}
+                  borderRadius="full"
                   justifySelf="center"
                   justifyContent="center"
                 >
                   <IconButton
-                    borderRadius="3xl"
+                    borderRadius="full"
                     colorScheme="blue"
                     onClick={handleBrowseImage}
                   >
@@ -209,7 +209,7 @@ const CreateOrEditRoomModal = props => {
                   </IconButton>
                   {formik.values.image && (
                     <IconButton
-                      borderRadius="3xl"
+                      borderRadius="full"
                       colorScheme="red"
                       onClick={handleUnselectImage}
                     >
@@ -245,13 +245,13 @@ const CreateOrEditRoomModal = props => {
               <FormErrorMessage>{formik.errors.description}</FormErrorMessage>
             </FormControl>
             <HStack spacing={4}>
-              {Object.keys(privacyOptions).map((key, i) => {
+              {Object.keys(privacyOptions).map(key => {
                 const selected = key === formik.values.privacy;
                 const option = privacyOptions[key];
 
                 return (
                   <Button
-                    key={i}
+                    key={key}
                     flex="1"
                     h="100%"
                     colorScheme={selected ? 'blue' : undefined}
