@@ -1,4 +1,5 @@
 import { VStack } from '@chakra-ui/layout';
+import React from 'react';
 import MessageForm from './MessageForm';
 import MessageList from './MessageList';
 

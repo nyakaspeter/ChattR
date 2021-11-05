@@ -1,5 +1,5 @@
 import { ChakraProvider, ColorModeScript } from '@chakra-ui/react';
-import { StrictMode } from 'react';
+import React, { StrictMode } from 'react';
 import ReactDOM from 'react-dom';
 import { QueryClientProvider } from 'react-query';
 import { BrowserRouter } from 'react-router-dom';

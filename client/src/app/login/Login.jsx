@@ -7,13 +7,14 @@ import {
   useColorModeValue,
   VisuallyHidden,
 } from '@chakra-ui/react';
+import React from 'react';
 import { FaFacebook, FaGithub, FaGoogle } from 'react-icons/fa';
 import Card from './Card';
 import DividerWithText from './DividerWithText';
 import Link from './Link';
 import LoginForm from './LoginForm';
 
-const Login = props => (
+const Login = () => (
   <Box
     bg={useColorModeValue('gray.50', 'inherit')}
     minH="100vh"

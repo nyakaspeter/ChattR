@@ -1,4 +1,6 @@
 import { ovApi, ovClient, sessions } from '../../config/openvidu.js';
+import Message from '../../models/message.js';
+import Room from '../../models/room.js';
 
 export const stopRecording = async (req, res) => {
   const roomId = req.params.roomId;

@@ -1,10 +1,11 @@
 import { Flex } from '@chakra-ui/layout';
+import React from 'react';
 import { useSocket } from '../../core/socketio';
 import RoomList from './list/RoomList';
 import Room from './room/Room';
 
-const Main = props => {
-  const socket = useSocket();
+const Main = () => {
+  useSocket();
 
   return (
     <Flex w="100vw" h="100vh">

@@ -1,5 +1,6 @@
 {
     "env": {
+        "node": true,
         "browser": true,
         "es2021": true
     },
@@ -18,7 +19,8 @@
         "react"
     ],
     "rules": {
-        "react/prop-types": 0
+        "react/prop-types": 0,
+        "react/no-unescaped-entities": 0
     },
     "settings": {
         "react": {

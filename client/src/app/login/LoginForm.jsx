@@ -6,6 +6,7 @@ import {
   Input,
   Stack,
 } from '@chakra-ui/react';
+import React from 'react';
 import PasswordField from './PasswordField';
 
 const LoginForm = props => (

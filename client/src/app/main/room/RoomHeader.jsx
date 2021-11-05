@@ -11,7 +11,7 @@ import {
 } from '@chakra-ui/menu';
 import { Fade } from '@chakra-ui/transition';
 import React from 'react';
-import { BsRecordFill, BsThreeDots } from 'react-icons/bs';
+import { BsThreeDots } from 'react-icons/bs';
 import { HiChatAlt2 } from 'react-icons/hi';
 import { ImExit } from 'react-icons/im';
 import { IoMdInformationCircle, IoMdPeople } from 'react-icons/io';

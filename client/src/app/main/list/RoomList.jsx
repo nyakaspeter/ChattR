@@ -48,10 +48,9 @@ const RoomList = props => {
           {(rooms.data.rooms.length > 0 || rooms.data.pending.length > 0) && (
             <Box px={2} pb={3}>
               <InputGroup>
-                <InputLeftElement
-                  pointerEvents="none"
-                  children={<SearchIcon color="gray.500" />}
-                />
+                <InputLeftElement pointerEvents="none">
+                  <SearchIcon color="gray.500" />
+                </InputLeftElement>
                 <Input
                   value={filter}
                   onChange={e => setFilter(e.target.value)}

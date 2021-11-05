@@ -1,5 +1,3 @@
-import { Center } from '@chakra-ui/layout';
-import { Spinner } from '@chakra-ui/spinner';
 import React from 'react';
 import { Redirect } from 'react-router';
 import { Route, Switch } from 'react-router-dom';

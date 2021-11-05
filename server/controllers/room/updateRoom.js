@@ -1,6 +1,5 @@
 import dotenv from 'dotenv';
 import { gfs } from '../../config/mongoose.js';
-import { ovApi } from '../../config/openvidu.js';
 import Room from '../../models/room.js';
 
 dotenv.config();

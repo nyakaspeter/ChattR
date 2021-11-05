@@ -73,6 +73,7 @@ const CreateOrEditRoomModal = props => {
     {
       onSuccess: data => {
         if (editing) {
+          // TODO?
         } else {
           const newRoom = {
             _id: data._id,
@@ -151,7 +152,7 @@ const CreateOrEditRoomModal = props => {
     imageInput.current.value = null;
   };
 
-  const handleUnselectImage = file => {
+  const handleUnselectImage = () => {
     formik.setFieldValue('image', null);
     imageUrl.current = undefined;
   };

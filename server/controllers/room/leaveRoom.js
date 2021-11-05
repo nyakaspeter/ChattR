@@ -1,6 +1,4 @@
-import { ovApi } from '../../config/openvidu.js';
 import Room from '../../models/room.js';
-import { deleteRoom } from './deleteRoom.js';
 
 export const leaveRoom = async (req, res) => {
   const roomId = req.params.roomId;

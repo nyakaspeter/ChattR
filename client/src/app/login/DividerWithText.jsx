@@ -1,7 +1,9 @@
 import { Box, Divider, Flex, Text, useColorModeValue } from '@chakra-ui/react';
+import React from 'react';
 
 const DividerWithText = props => {
   const { children, ...flexProps } = props;
+
   return (
     <Flex align="center" color="gray.300" {...flexProps}>
       <Box flex="1">

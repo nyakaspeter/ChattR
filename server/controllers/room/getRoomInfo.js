@@ -1,4 +1,3 @@
-import { ovApi } from '../../config/openvidu.js';
 import Room from '../../models/room.js';
 
 export const getRoomInfo = async (req, res) => {
@@ -24,6 +23,7 @@ export const getRoomInfo = async (req, res) => {
       })
       .lean();
 
+    // eslint-disable-next-line no-unused-vars
     const { usersWhoRequestedToJoin, ...rest } = room;
 
     return res.json(room.owner.equals(userId) ? room : { ...rest });

@@ -1,5 +1,6 @@
 import { Center, Text, VStack } from '@chakra-ui/layout';
 import { Spinner } from '@chakra-ui/spinner';
+import React from 'react';
 
 export const Loading = props => {
   const { text, fullscreen, ...rest } = props;

@@ -1,6 +1,6 @@
 import { IconButton } from '@chakra-ui/button';
 import { ArrowDownIcon } from '@chakra-ui/icons';
-import { Box, VStack } from '@chakra-ui/layout';
+import { VStack } from '@chakra-ui/layout';
 import { Fade } from '@chakra-ui/transition';
 import React, { useEffect, useRef, useState } from 'react';
 import { ScrollView } from '../../../components/ScrollView';

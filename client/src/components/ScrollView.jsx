@@ -21,3 +21,5 @@ export const ScrollView = React.forwardRef((props, ref) => {
     />
   );
 });
+
+ScrollView.displayName = 'ScrollView';

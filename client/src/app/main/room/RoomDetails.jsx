@@ -1,5 +1,6 @@
 import { Avatar } from '@chakra-ui/avatar';
 import { Badge, Heading, HStack, Text, VStack } from '@chakra-ui/layout';
+import React from 'react';
 
 const RoomDetails = props => {
   const { room, ...rest } = props;

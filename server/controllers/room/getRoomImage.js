@@ -1,5 +1,5 @@
 import dotenv from 'dotenv';
-import mongoose, { gfs } from '../../config/mongoose.js';
+import { gfs } from '../../config/mongoose.js';
 import Room from '../../models/room.js';
 
 dotenv.config();

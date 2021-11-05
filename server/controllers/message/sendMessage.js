@@ -21,6 +21,7 @@ export const sendMessage = async (req, res) => {
       $push: { messages: newMessage },
     });
 
+    // eslint-disable-next-line no-unused-vars
     const { email, ...senderProps } = req.user;
 
     socketio.emitToRoom(roomId, 'message', {

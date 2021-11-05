@@ -1,6 +1,5 @@
 import { OpenViduRole } from 'openvidu-node-client';
 import { ovClient, sessions } from '../../config/openvidu.js';
-import Room from '../../models/room.js';
 
 export const getRoomToken = async (req, res) => {
   const roomId = req.params.roomId;

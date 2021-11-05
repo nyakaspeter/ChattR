@@ -1,5 +1,4 @@
 import dotenv from 'dotenv';
-import { ovApi, sessions } from '../../config/openvidu.js';
 import Room from '../../models/room.js';
 
 dotenv.config();

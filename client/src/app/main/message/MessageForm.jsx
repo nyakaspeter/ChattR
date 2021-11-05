@@ -1,10 +1,9 @@
 import { Button, IconButton } from '@chakra-ui/button';
 import { useColorModeValue } from '@chakra-ui/color-mode';
-import { ChatIcon, CloseIcon, DeleteIcon } from '@chakra-ui/icons';
+import { ChatIcon, CloseIcon } from '@chakra-ui/icons';
 import {
   Box,
   Center,
-  Flex,
   HStack,
   SimpleGrid,
   Text,
@@ -15,7 +14,7 @@ import { Fade } from '@chakra-ui/transition';
 import React, { useRef, useState } from 'react';
 import { BiSend } from 'react-icons/bi';
 import { FaRegFile } from 'react-icons/fa';
-import { MdAttachFile, MdDelete } from 'react-icons/md';
+import { MdAttachFile } from 'react-icons/md';
 import ResizeTextarea from 'react-textarea-autosize';
 import { sendMessage } from '../../../core/api';
 

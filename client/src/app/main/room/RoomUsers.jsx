@@ -1,7 +1,8 @@
 import { Avatar, AvatarBadge } from '@chakra-ui/avatar';
 import { IconButton } from '@chakra-ui/button';
 import { CheckIcon, CloseIcon } from '@chakra-ui/icons';
-import { Badge, Box, Heading, HStack, Text, VStack } from '@chakra-ui/layout';
+import { Box, HStack, Text, VStack } from '@chakra-ui/layout';
+import React from 'react';
 import { useMutation, useQueryClient } from 'react-query';
 import { joinRoomAccept, joinRoomDecline } from '../../../core/api';
 
