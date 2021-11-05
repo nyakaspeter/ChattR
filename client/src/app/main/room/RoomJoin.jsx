@@ -15,7 +15,7 @@ import { useFormik } from 'formik';
 import React, { useState } from 'react';
 import { useMutation, useQueryClient } from 'react-query';
 import { useHistory } from 'react-router';
-import { joinRoom } from '../../../core/api';
+import { joinRoom, joinRoomCancel } from '../../../core/api';
 
 const RoomJoin = props => {
   const { room, ...rest } = props;
@@ -25,7 +25,7 @@ const RoomJoin = props => {
 
   const [showPassword, setShowPassword] = useState(false);
 
-  const mutation = useMutation(
+  const joinMutation = useMutation(
     ({ roomId, password }) => joinRoom(roomId, { password }),
     {
       onSuccess: () => {
@@ -37,6 +37,15 @@ const RoomJoin = props => {
       },
     }
   );
+
+  const cancelMutation = useMutation(roomId => joinRoomCancel(roomId), {
+    onSuccess: () => {
+      queryClient.invalidateQueries('rooms');
+      queryClient.invalidateQueries(['room', room._id]);
+
+      history.push('/');
+    },
+  });
 
   const formik = useFormik({
     initialValues: {
@@ -52,11 +61,15 @@ const RoomJoin = props => {
 
       return errors;
     },
-    onSubmit: values => mutation.mutate(values),
+    onSubmit: values => joinMutation.mutate(values),
   });
 
   const handleCancel = () => {
-    history.push('/');
+    if (room.privacy === 'private' && room.status === 'requestedToJoin') {
+      cancelMutation.mutate(room._id);
+    } else {
+      history.push('/');
+    }
   };
 
   const message = () => {
@@ -132,22 +145,25 @@ const RoomJoin = props => {
             )}
           </VStack>
 
-          {(room.privacy === 'public' ||
-            room.privacy === 'protected' ||
-            (room.privacy === 'private' && room.status === 'notMember')) && (
-            <VStack spacing={4}>
+          <VStack spacing={4}>
+            {(room.privacy !== 'private' ||
+              room.status !== 'requestedToJoin') && (
               <Button
                 onClick={formik.handleSubmit}
-                isLoading={mutation.isLoading}
+                isLoading={joinMutation.isLoading}
                 colorScheme="blue"
               >
                 {buttonText()}
               </Button>
-              <Button colorScheme="red" onClick={handleCancel}>
-                I don't want to join
-              </Button>
-            </VStack>
-          )}
+            )}
+            <Button
+              onClick={handleCancel}
+              isLoading={cancelMutation.isLoading}
+              colorScheme="red"
+            >
+              I don't want to join
+            </Button>
+          </VStack>
         </VStack>
       </Fade>
     </Center>

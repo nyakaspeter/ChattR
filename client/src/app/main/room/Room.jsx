@@ -22,7 +22,7 @@ const Room = props => {
     // Close sidepanel on switching room
 
     setPanel(null);
-  }, [room.data]);
+  }, [roomId]);
 
   return (
     <HStack {...props} alignItems="stretch">
@@ -40,6 +40,7 @@ const Room = props => {
               borderLeftWidth="1px"
               title={panel.title}
               content={panel.content}
+              room={room.data}
               onClose={handleClosePanel}
             />
           )}

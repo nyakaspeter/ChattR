@@ -83,7 +83,10 @@ const CreateOrEditRoomModal = props => {
             lastActivity: data.lastActivity,
           };
 
-          queryClient.setQueryData('rooms', old => [...old, newRoom]);
+          queryClient.setQueryData('rooms', old => ({
+            rooms: [...old.rooms, newRoom],
+            pending: old.pending,
+          }));
         }
 
         handleClose();

@@ -1,10 +1,9 @@
-import { Avatar } from '@chakra-ui/avatar';
 import { IconButton } from '@chakra-ui/button';
 import { CloseIcon } from '@chakra-ui/icons';
-import { Badge, Box, Heading, HStack, Text, VStack } from '@chakra-ui/layout';
+import { Box, Heading, HStack, VStack } from '@chakra-ui/layout';
 
 const SidePanel = props => {
-  const { title, content, room, onClose, ...rest } = props;
+  const { title, content: Content, room, onClose, ...rest } = props;
 
   return (
     <VStack {...rest} spacing={0} alignItems="stretch">
@@ -15,7 +14,7 @@ const SidePanel = props => {
           <CloseIcon />
         </IconButton>
       </HStack>
-      {content}
+      <Content room={room} />
     </VStack>
   );
 };

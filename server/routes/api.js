@@ -12,6 +12,9 @@ import { getRoomInfo } from '../controllers/room/getRoomInfo.js';
 import { getRooms } from '../controllers/room/getRooms.js';
 import { getRoomToken } from '../controllers/room/getRoomToken.js';
 import { joinRoom } from '../controllers/room/joinRoom.js';
+import { joinRoomCancel } from '../controllers/room/joinRoomCancel.js';
+import { joinRoomAccept } from '../controllers/room/joinRoomAccept.js';
+import { joinRoomDecline } from '../controllers/room/joinRoomDecline.js';
 import { leaveRoom } from '../controllers/room/leaveRoom.js';
 import { updateRoom } from '../controllers/room/updateRoom.js';
 import { getUser } from '../controllers/user/getUser.js';
@@ -31,6 +34,20 @@ router.post(
 );
 
 router.post('/room/:roomId/join', joinRoom);
+
+router.get('/room/:roomId/join/cancel', joinRoomCancel);
+
+router.get(
+  '/room/:roomId/join/:userId/accept',
+  authorize('roomOwner'),
+  joinRoomAccept
+);
+
+router.get(
+  '/room/:roomId/join/:userId/decline',
+  authorize('roomOwner'),
+  joinRoomDecline
+);
 
 router.get('/room/:roomId/leave', authorize('roomUser'), leaveRoom);
 

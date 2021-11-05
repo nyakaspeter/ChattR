@@ -16,20 +16,35 @@ export const getRooms = async (req, res) => {
       .populate({
         path: 'messages.sender',
         model: 'User',
-        select: 'name picture',
+        select: 'name',
       })
       .lean();
 
-    return res.json(
-      rooms.map(room => {
+    const pending = await Room.find(
+      { usersWhoRequestedToJoin: userId },
+      undefined,
+      { select: 'name image users' }
+    )
+      .populate({ path: 'users', model: 'User', select: 'online' })
+      .lean();
+
+    return res.json({
+      rooms: rooms.map(room => {
         const { users, messages, ...rest } = room;
         return {
           ...rest,
           onlineUserCount: users.filter(u => u.online).length,
           lastMessage: messages[0] || null,
         };
-      })
-    );
+      }),
+      pending: pending.map(room => {
+        const { users, ...rest } = room;
+        return {
+          ...rest,
+          onlineUserCount: users.filter(u => u.online).length,
+        };
+      }),
+    });
   } catch (err) {
     console.error(err);
     return res.status(404).send(err.message);

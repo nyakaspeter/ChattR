@@ -23,9 +23,10 @@ const DeleteRoomModal = props => {
     onSuccess: () => {
       handleClose();
 
-      queryClient.setQueryData('rooms', old =>
-        old.filter(r => r._id !== room._id)
-      );
+      queryClient.setQueryData('rooms', old => ({
+        rooms: old.rooms.filter(r => r._id !== room._id),
+        pending: old.pending,
+      }));
       queryClient.removeQueries(['room', room._id]);
 
       history.push('/');

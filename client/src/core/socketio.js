@@ -25,10 +25,9 @@ export async function wsConnect() {
   });
 
   socket.on('message', async e => {
-    const queryKey = ['room', e.roomId, 'messages'];
-    await queryClient.cancelQueries(queryKey);
+    await queryClient.cancelQueries(['room', e.roomId, 'messages']);
 
-    queryClient.setQueryData(queryKey, old => {
+    queryClient.setQueryData(['room', e.roomId, 'messages'], old => {
       if (old) {
         const message = old.find(message => message._id === e.message._id);
         return message ? old : [...old, e.message];
@@ -37,7 +36,7 @@ export async function wsConnect() {
     });
 
     queryClient.setQueryData('rooms', old => {
-      const rooms = [...old];
+      const rooms = old.rooms;
       const lastMessage = { ...e.message };
       lastMessage.sender = e.sender;
 
@@ -45,7 +44,7 @@ export async function wsConnect() {
       room.lastMessage = lastMessage;
       room.lastActivity = e.message.date;
 
-      return rooms;
+      return { rooms, pending: old.pending };
     });
   });
 }

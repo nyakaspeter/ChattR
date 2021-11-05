@@ -25,6 +25,18 @@ export async function joinRoom(roomId, joinFormData) {
   return (await api.post(`room/${roomId}/join`, joinFormData)).data;
 }
 
+export async function joinRoomCancel(roomId) {
+  return (await api.get(`room/${roomId}/join/cancel`)).data;
+}
+
+export async function joinRoomAccept(roomId, userId) {
+  return (await api.get(`room/${roomId}/join/${userId}/accept`)).data;
+}
+
+export async function joinRoomDecline(roomId, userId) {
+  return (await api.get(`room/${roomId}/join/${userId}/decline`)).data;
+}
+
 export async function leaveRoom(roomId) {
   return (await api.get(`room/${roomId}/leave`)).data;
 }

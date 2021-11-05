@@ -51,22 +51,19 @@ const RoomHeader = props => {
   } = useDisclosure();
 
   const handleOpenCallPanel = () => {
-    onOpenPanel({ title: 'Call' });
+    onOpenPanel({ title: 'Call', content: Box });
   };
 
   const handleOpenMessagesPanel = () => {
-    onOpenPanel({
-      title: 'Messages',
-      content: <Messages flex="1" room={room} />,
-    });
+    onOpenPanel({ title: 'Messages', content: Messages });
   };
 
   const handleOpenUsersPanel = () => {
-    onOpenPanel({ title: 'Users', content: <RoomUsers room={room} /> });
+    onOpenPanel({ title: 'Users', content: RoomUsers });
   };
 
   const handleOpenDetailsPanel = () => {
-    onOpenPanel({ title: 'Details', content: <RoomDetails room={room} /> });
+    onOpenPanel({ title: 'Details', content: RoomDetails });
   };
 
   return (
