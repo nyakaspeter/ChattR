@@ -1,6 +1,7 @@
 import { IconButton } from '@chakra-ui/button';
 import { CloseIcon } from '@chakra-ui/icons';
 import { Box, Heading, HStack, VStack } from '@chakra-ui/layout';
+import React from 'react';
 
 const SidePanel = props => {
   const { title, content: Content, room, onClose, ...rest } = props;

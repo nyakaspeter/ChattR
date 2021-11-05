@@ -1,6 +1,7 @@
 {
   "name": "client",
   "version": "1.0.0",
+  "license": "ISC",
   "dependencies": {
     "@chakra-ui/icons": "^1.0.15",
     "@chakra-ui/react": "^1.0.0",
@@ -41,5 +42,9 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
+  },
+  "devDependencies": {
+    "eslint": "^7",
+    "eslint-plugin-react": "^7.26.1"
   }
 }

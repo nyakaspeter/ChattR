@@ -1,6 +1,7 @@
 {
   "name": "chattr",
   "version": "1.0.0",
+  "license": "ISC",
   "description": "Experimental chat app powered by WebSockets & WebRTC",
   "main": "index.js",
   "author": "Nyakas Péter",

@@ -13,7 +13,7 @@ const Room = props => {
   const room = useRoom(roomId);
 
   const [panel, setPanel] = useState(null);
-  const [inCall, setInCall] = useState(false);
+  //const [inCall, setInCall] = useState(false);
 
   const handleOpenPanel = panel => setPanel(panel);
   const handleClosePanel = () => setPanel(null);
