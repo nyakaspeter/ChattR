@@ -11,7 +11,8 @@ import {
 } from '@chakra-ui/layout';
 import { Textarea } from '@chakra-ui/textarea';
 import { Fade } from '@chakra-ui/transition';
-import React, { useRef, useState } from 'react';
+import { useFormik } from 'formik';
+import React, { useRef } from 'react';
 import { BiSend } from 'react-icons/bi';
 import { FaRegFile } from 'react-icons/fa';
 import { MdAttachFile } from 'react-icons/md';
@@ -23,20 +24,62 @@ const MessageForm = props => {
   const { room, ...rest } = props;
 
   const fileBg = useColorModeValue('blackAlpha.100', 'whiteAlpha.100');
+  const fileInput = useRef();
 
-  const mutation = useMutation(formData => sendMessage(room._id, formData), {
-    onMutate: () => {
-      setText('');
-      setFiles([]);
+  const mutation = useMutation(
+    formValues => {
+      const trimmedText = formValues.text.trim();
+      const formData = new FormData();
+      formValues.files.forEach(file => formData.append('files', file));
+      if (trimmedText) formData.append('text', trimmedText);
+
+      return sendMessage(room._id, formData);
     },
-    onSuccess: () => {},
+    {
+      onError: async (error, formValues) => {
+        await formik.setValues(formValues);
+        formik.setFieldError('text', 'Remote request failed');
+      },
+    }
+  );
+
+  const formik = useFormik({
+    initialValues: {
+      text: '',
+      files: [],
+    },
+    validate: values => {
+      let errors = {};
+
+      if (!values.text.trim() && values.files.length === 0) {
+        errors.text = 'You cannot send an empty message';
+      }
+
+      return errors;
+    },
+    onSubmit: values => {
+      mutation.mutate(values);
+      formik.resetForm();
+    },
   });
 
-  // TODO: Use formik
+  const handleTextInput = event => {
+    if (event.target.value === '' || event.target.value.trim()) {
+      formik.handleChange(event);
+    }
+  };
 
-  const [text, setText] = useState('');
-  const [files, setFiles] = useState([]);
-  const fileInput = useRef();
+  const handleKeyDown = event => {
+    if (event.keyCode === 13 && !event.shiftKey) {
+      formik.submitForm();
+    }
+  };
+
+  const handleOnBlur = () => {
+    if (formik.errors.text !== 'Remote request failed') {
+      formik.setFieldError('text', '');
+    }
+  };
 
   const handleBrowseFiles = () => {
     fileInput.current?.click();
@@ -46,44 +89,21 @@ const MessageForm = props => {
     const pickedFiles = [...event.target.files];
 
     const addedFiles = pickedFiles.filter(
-      f => !files.find(file => file.name === f.name)
+      f => !formik.values.files.find(file => file.name === f.name)
     );
 
-    const newFiles = [...files, ...addedFiles];
+    const newFiles = [...formik.values.files, ...addedFiles];
     newFiles.sort((a, b) => a.name.localeCompare(b.name));
 
-    setFiles(newFiles);
-
+    formik.setFieldValue('files', newFiles);
     fileInput.current.value = null;
   };
 
   const handleUnselectFile = file => {
-    setFiles(files.filter(f => f !== file) || []);
-  };
-
-  const handleTextInput = event => {
-    if (event.target.value === '' || event.target.value.trim()) {
-      setText(event.target.value);
-    }
-  };
-
-  const handleKeyDown = event => {
-    if (event.keyCode === 13 && !event.shiftKey) {
-      handleSendMessage();
-    }
-  };
-
-  const handleSendMessage = () => {
-    const trimmedText = text.trim();
-    if (!trimmedText) {
-      return;
-    }
-
-    const formData = new FormData();
-    files.forEach(file => formData.append('files', file));
-    formData.append('text', trimmedText);
-
-    mutation.mutate(formData);
+    formik.setFieldValue(
+      'files',
+      formik.values.files.filter(f => f !== file) || []
+    );
   };
 
   return (
@@ -91,9 +111,12 @@ const MessageForm = props => {
       <VStack {...rest} p={2} alignItems="stretch">
         <Box position="relative">
           <Textarea
-            value={text}
+            name="text"
+            value={formik.values.text}
             onChange={handleTextInput}
             onKeyDown={handleKeyDown}
+            onBlur={handleOnBlur}
+            isInvalid={formik.errors.text}
             placeholder="Write a message"
             variant="filled"
             borderRadius="3xl"
@@ -121,7 +144,7 @@ const MessageForm = props => {
                 <MdAttachFile size={24} />
               </IconButton>
               <IconButton
-                onClick={handleSendMessage}
+                onClick={formik.handleSubmit}
                 isLoading={mutation.isLoading}
                 size="sm"
                 color="gray.500"
@@ -140,7 +163,7 @@ const MessageForm = props => {
           multiple
           onChange={handleChooseFiles}
         />
-        {files.length > 0 && (
+        {formik.values.files.length > 0 && (
           <SimpleGrid
             minChildWidth={200}
             maxH={204}
@@ -149,7 +172,7 @@ const MessageForm = props => {
             overflowY="auto"
             overflowX="hidden"
           >
-            {files.map(file => (
+            {formik.values.files.map(file => (
               <HStack
                 key={file.name}
                 p={2.5}

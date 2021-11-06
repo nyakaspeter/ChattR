@@ -37,7 +37,7 @@ const MessageListItem = props => {
         borderRadius="xl"
         alignItems="start"
       >
-        <Text whiteSpace="pre-wrap">{message.text}</Text>
+        {message.text && <Text whiteSpace="pre-wrap">{message.text}</Text>}
         {message.files.length > 0 && (
           <SimpleGrid
             alignSelf="stretch"
