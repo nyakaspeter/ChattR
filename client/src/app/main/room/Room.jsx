@@ -47,9 +47,9 @@ const Room = props => {
         </>
       )}
 
-      {room.isError && (
+      {room.error && (
         <>
-          {room.error?.response?.data?.room ? (
+          {room.error.response?.data?.room ? (
             <RoomJoin flex="1" room={room.error.response.data.room} />
           ) : (
             <Redirect to="/r" />

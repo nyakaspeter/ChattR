@@ -46,7 +46,9 @@ export const useSocket = options => {
 };
 
 export const useRooms = options => {
-  const queryOptions = {};
+  const queryOptions = {
+    refetchOnMount: false,
+  };
 
   return useQuery(roomKeys.list(), () => getRooms(), options || queryOptions);
 };
@@ -58,6 +60,7 @@ export const useRoom = (roomId, options) => {
       failureCount < 3 &&
       error.response?.status !== 403 &&
       error.response?.status !== 404,
+    refetchOnMount: false,
   };
 
   return useQuery(
@@ -68,7 +71,9 @@ export const useRoom = (roomId, options) => {
 };
 
 export const useMessages = (roomId, options) => {
-  const queryOptions = {};
+  const queryOptions = {
+    refetchOnMount: false,
+  };
 
   return useQuery(
     roomKeys.messageList(roomId),

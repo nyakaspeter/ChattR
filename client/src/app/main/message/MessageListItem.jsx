@@ -1,4 +1,4 @@
-import { Avatar } from '@chakra-ui/avatar';
+import { Avatar, AvatarBadge } from '@chakra-ui/avatar';
 import { Button } from '@chakra-ui/button';
 import { useColorModeValue } from '@chakra-ui/color-mode';
 import { DownloadIcon } from '@chakra-ui/icons';
@@ -20,7 +20,9 @@ const MessageListItem = props => {
       name={sender.name}
       src={sender.picture}
       opacity={showAvatar ? 1 : 0}
-    />
+    >
+      {sender.online && <AvatarBadge boxSize={4} bg="green.400" />}
+    </Avatar>
   );
 
   return (

@@ -49,6 +49,7 @@ const privacyOptions = {
 
 const CreateOrEditRoomModal = props => {
   const { isOpen, onClose, room } = props;
+
   const editing = !!room;
   const hasImage = editing && room.image;
 

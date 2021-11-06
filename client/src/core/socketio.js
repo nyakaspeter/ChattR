@@ -1,5 +1,18 @@
 import io from 'socket.io-client';
-import { queryClient, roomKeys, socketKeys } from './query';
+import { queryClient, socketKeys } from './query';
+import { handleJoinRequestAccepted } from './signals/joinRequestAccepted';
+import { handleJoinRequestCancelled } from './signals/joinRequestCancelled';
+import { handleJoinRequestDeclined } from './signals/joinRequestDeclined';
+import { handleMessage } from './signals/message';
+import { handleRecordingStarted } from './signals/recordingStarted';
+import { handleRecordingStopped } from './signals/recordingStopped';
+import { handleRoomDeleted } from './signals/roomDeleted';
+import { handleRoomUpdated } from './signals/roomUpdated';
+import { handleUserJoined } from './signals/userJoined';
+import { handleUserLeft } from './signals/userLeft';
+import { handleUserOffline } from './signals/userOffline';
+import { handleUserOnline } from './signals/userOnline';
+import { handleUserRequestedToJoin } from './signals/userRequestedToJoin';
 
 let socket;
 
@@ -36,29 +49,17 @@ export async function wsConnect() {
     queryClient.invalidateQueries(socketKeys.current());
   });
 
-  socket.on('message', async e => {
-    await queryClient.cancelQueries(roomKeys.messageList(e.roomId));
-
-    queryClient.setQueryData(roomKeys.messageList(e.roomId), old => {
-      if (old) {
-        const message = old.find(message => message._id === e.message._id);
-        return message ? old : [...old, e.message];
-      }
-      return [e.message];
-    });
-
-    queryClient.setQueryData(roomKeys.list(), old => {
-      const rooms = old.rooms;
-      const pending = old.pending;
-
-      const lastMessage = { ...e.message };
-      lastMessage.sender = e.sender;
-
-      const room = rooms.find(r => r._id === e.roomId);
-      room.lastMessage = lastMessage;
-      room.lastActivity = e.message.date;
-
-      return { rooms, pending };
-    });
-  });
+  socket.on('joinRequestAccepted', handleJoinRequestAccepted);
+  socket.on('joinRequestCancelled', handleJoinRequestCancelled);
+  socket.on('joinRequestDeclined', handleJoinRequestDeclined);
+  socket.on('message', handleMessage);
+  socket.on('recordingStarted', handleRecordingStarted);
+  socket.on('recordingStopped', handleRecordingStopped);
+  socket.on('roomDeleted', handleRoomDeleted);
+  socket.on('roomUpdated', handleRoomUpdated);
+  socket.on('userJoined', handleUserJoined);
+  socket.on('userLeft', handleUserLeft);
+  socket.on('userOffline', handleUserOffline);
+  socket.on('userOnline', handleUserOnline);
+  socket.on('userRequestedToJoin', handleUserRequestedToJoin);
 }
