@@ -47,11 +47,15 @@ const Room = props => {
         </>
       )}
 
-      {room.error?.response?.data && (
-        <RoomJoin flex="1" room={room.error.response.data} />
+      {room.isError && (
+        <>
+          {room.error?.response?.data?.room ? (
+            <RoomJoin flex="1" room={room.error.response.data.room} />
+          ) : (
+            <Redirect to="/r" />
+          )}
+        </>
       )}
-
-      {room.isError && !room.error?.response?.data && <Redirect to="/r" />}
     </HStack>
   );
 };

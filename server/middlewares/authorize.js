@@ -47,14 +47,16 @@ export const authorize = level => async (req, res, next) => {
     );
 
     return res.status(403).json({
-      _id: room._id,
-      name: room.name,
-      description: room.description,
-      privacy: room.privacy,
-      userCount: room.users.length,
-      onlineUserCount: room.users.filter(u => u.online).length,
-      hasImage: !!room.image,
-      status: requested ? 'requestedToJoin' : 'notMember',
+      room: {
+        _id: room._id,
+        name: room.name,
+        description: room.description,
+        privacy: room.privacy,
+        userCount: room.users.length,
+        onlineUserCount: room.users.filter(u => u.online).length,
+        hasImage: !!room.image,
+        status: requested ? 'requestedToJoin' : 'notMember',
+      },
     });
   } catch (err) {
     console.error(err);
