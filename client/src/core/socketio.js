@@ -12,6 +12,19 @@ export async function wsConnect() {
   socket = io.connect('/');
 
   socket.on('connect', () => {
+    // Setup debug logging
+    const onevent = socket.onevent;
+    socket.onevent = function (packet) {
+      var args = packet.data || [];
+      onevent.call(this, packet); // Original call
+      packet.data = ['*'].concat(args);
+      onevent.call(this, packet); // Additional call to catch-all
+    };
+
+    socket.on('*', (event, data) => {
+      console.log(event, data);
+    });
+
     return socket;
   });
 

@@ -15,6 +15,7 @@ import React, { useRef, useState } from 'react';
 import { BiSend } from 'react-icons/bi';
 import { FaRegFile } from 'react-icons/fa';
 import { MdAttachFile } from 'react-icons/md';
+import { useMutation } from 'react-query';
 import ResizeTextarea from 'react-textarea-autosize';
 import { sendMessage } from '../../../core/api';
 
@@ -22,6 +23,16 @@ const MessageForm = props => {
   const { room, ...rest } = props;
 
   const fileBg = useColorModeValue('blackAlpha.100', 'whiteAlpha.100');
+
+  const mutation = useMutation(formData => sendMessage(room._id, formData), {
+    onMutate: () => {
+      setText('');
+      setFiles([]);
+    },
+    onSuccess: () => {},
+  });
+
+  // TODO: Use formik
 
   const [text, setText] = useState('');
   const [files, setFiles] = useState([]);
@@ -72,11 +83,7 @@ const MessageForm = props => {
     files.forEach(file => formData.append('files', file));
     formData.append('text', trimmedText);
 
-    // TODO MUTATION
-    sendMessage(room._id, formData);
-
-    setText('');
-    setFiles([]);
+    mutation.mutate(formData);
   };
 
   return (
@@ -102,17 +109,21 @@ const MessageForm = props => {
             <ChatIcon color="gray.500" />
           </Center>
           <Center>
-            <HStack position="absolute" right={0} top={0} h="100%" spacing={1}>
+            <HStack position="absolute" right={1} top={0} h="100%" spacing={2}>
               <IconButton
                 onClick={handleBrowseFiles}
+                size="sm"
                 color="gray.500"
                 bg="transparent"
                 borderRadius="full"
+                pointerEvents="auto"
               >
                 <MdAttachFile size={24} />
               </IconButton>
               <IconButton
                 onClick={handleSendMessage}
+                isLoading={mutation.isLoading}
+                size="sm"
                 color="gray.500"
                 bg="transparent"
                 borderRadius="full"

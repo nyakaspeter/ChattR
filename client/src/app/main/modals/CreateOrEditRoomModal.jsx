@@ -73,9 +73,7 @@ const CreateOrEditRoomModal = props => {
     },
     {
       onSuccess: data => {
-        if (editing) {
-          // TODO?
-        } else {
+        if (!editing) {
           const newRoom = {
             _id: data._id,
             name: data.name,

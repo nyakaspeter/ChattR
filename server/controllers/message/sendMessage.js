@@ -1,16 +1,17 @@
 import mongoose from '../../config/mongoose.js';
-import socketio from '../../config/socketio.js';
 import Room from '../../models/room.js';
+import { signalMessage } from '../../signals/message.js';
 
 export const sendMessage = async (req, res) => {
   const roomId = req.params.roomId;
+  const sender = req.user;
   const message = req.body;
   const files = req.files;
 
   try {
     const newMessage = {
       _id: new mongoose.Types.ObjectId(),
-      sender: req.user._id,
+      sender: sender._id,
       date: new Date(),
       text: message.text,
       files: files,
@@ -21,14 +22,7 @@ export const sendMessage = async (req, res) => {
       $push: { messages: newMessage },
     });
 
-    // eslint-disable-next-line no-unused-vars
-    const { email, ...senderProps } = req.user;
-
-    socketio.emitToRoom(roomId, 'message', {
-      roomId,
-      sender: { ...senderProps },
-      message: newMessage,
-    });
+    await signalMessage(roomId, sender, newMessage);
 
     return res.json(newMessage);
   } catch (err) {

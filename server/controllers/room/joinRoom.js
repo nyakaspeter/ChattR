@@ -1,6 +1,9 @@
 import Room from '../../models/room.js';
+import { signalUserJoined } from '../../signals/userJoined.js';
+import { signalUserRequestedToJoin } from '../../signals/userRequestedToJoin.js';
 
 export const joinRoom = async (req, res) => {
+  const userId = req.user._id;
   const roomId = req.params.roomId;
   const password = req.body.password;
 
@@ -12,20 +15,24 @@ export const joinRoom = async (req, res) => {
       (room.privacy === 'protected' && room.password === password)
     ) {
       await Room.findByIdAndUpdate(roomId, {
-        $addToSet: { users: req.user._id },
+        $addToSet: { users: userId },
         $pull: {
-          usersWhoLeft: req.user._id,
-          usersWhoRequestedToJoin: req.user._id,
+          usersWhoLeft: userId,
+          usersWhoRequestedToJoin: userId,
         },
       });
+
+      await signalUserJoined(roomId, userId);
 
       return res.status(200).end();
     }
 
     if (room.privacy === 'private') {
       await Room.findByIdAndUpdate(roomId, {
-        $addToSet: { usersWhoRequestedToJoin: req.user._id },
+        $addToSet: { usersWhoRequestedToJoin: userId },
       });
+
+      await signalUserRequestedToJoin(roomId, userId);
 
       return res.status(200).end();
     }

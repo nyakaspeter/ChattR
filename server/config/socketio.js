@@ -1,6 +1,8 @@
 import { Server } from 'socket.io';
 import Room from '../models/room.js';
 import User from '../models/user.js';
+import { signalUserOffline } from '../signals/userOffline.js';
+import { signalUserOnline } from '../signals/userOnline.js';
 
 const socketio = {
   io: undefined,
@@ -26,21 +28,13 @@ const socketio = {
     io.on('connection', async socket => {
       const userId = socket.request.user._id;
 
-      // console.log(
-      //   'User connected to websocket:',
-      //   socket.request.user._id.toString()
-      // );
-
       await User.findByIdAndUpdate(userId, { online: true });
+      await signalUserOnline(userId);
 
       socket.on('disconnect', async () => {
-        // console.log(
-        //   'User disconnected from websocket:',
-        //   socket.request.user._id.toString()
-        // );
-
         if (!this.isOnline(userId)) {
           await User.findByIdAndUpdate(userId, { online: false });
+          await signalUserOffline(userId);
         }
       });
     });
@@ -55,14 +49,16 @@ const socketio = {
   isOnline: function (userId) {
     return this.filterSocketsByUser(user => user._id.equals(userId)).length > 0;
   },
-  emitToUser: function (userId, event, ...args) {
+  emitToUser: function (userId, event, args) {
     this.filterSocketsByUser(user => user._id.equals(userId)).forEach(socket =>
-      socket.emit(event, ...args)
+      socket.emit(event, args)
     );
   },
-  emitToRoom: async function (roomId, event, ...args) {
+  emitToRoom: async function (roomId, event, args) {
     const room = await Room.findById(roomId, 'users').lean();
-    room?.users.forEach(userId => this.emitToUser(userId, event, ...args));
+    room?.users.forEach(userId =>
+      this.emitToUser(userId, event, { roomId, ...args })
+    );
   },
 };
 

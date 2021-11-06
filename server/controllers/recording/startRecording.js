@@ -7,6 +7,8 @@ export const startRecording = async (req, res) => {
   try {
     const recording = await ovClient.startRecording(session.sessionId);
 
+    // TODO: Signal to room that recording has started
+
     res.status(200).json(recording);
   } catch (err) {
     console.error(err);

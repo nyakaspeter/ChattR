@@ -1,6 +1,7 @@
 import dotenv from 'dotenv';
 import { gfs } from '../../config/mongoose.js';
 import Room from '../../models/room.js';
+import { signalRoomUpdated } from '../../signals/roomUpdated.js';
 
 dotenv.config();
 
@@ -18,16 +19,12 @@ export const updateRoom = async (req, res) => {
       }
     }
 
-    await Room.findByIdAndUpdate(roomId, room, {
-      // new: true,
-      // select: '-users -messages',
+    const newRoom = await Room.findByIdAndUpdate(roomId, room, {
+      new: true,
+      select: 'name description image privacy',
     });
 
-    // await ovApi.post('signal', {
-    //   session: roomId,
-    //   type: 'signal:roomUpdated',
-    //   data: JSON.stringify(room),
-    // });
+    await signalRoomUpdated(roomId, newRoom);
 
     return res.end();
   } catch (err) {

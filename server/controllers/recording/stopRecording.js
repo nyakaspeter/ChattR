@@ -1,11 +1,11 @@
-import { ovApi, ovClient, sessions } from '../../config/openvidu.js';
+import { ovClient } from '../../config/openvidu.js';
 import Message from '../../models/message.js';
 import Room from '../../models/room.js';
 
 export const stopRecording = async (req, res) => {
   const roomId = req.params.roomId;
   const recordingId = req.body.id;
-  const session = sessions[roomId];
+  //const session = sessions[roomId];
 
   try {
     const recording = await ovClient.stopRecording(recordingId);
@@ -18,11 +18,7 @@ export const stopRecording = async (req, res) => {
 
     await Room.findByIdAndUpdate(roomId, { $push: { messages: newMessage } });
 
-    await ovApi.post('signal', {
-      session: session.sessionId,
-      type: 'signal:message',
-      data: JSON.stringify(newMessage),
-    });
+    // TODO: Signal to room that recording has stopped
 
     res.status(200).json(recording);
   } catch (err) {

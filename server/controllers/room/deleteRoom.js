@@ -1,5 +1,6 @@
 import dotenv from 'dotenv';
 import Room from '../../models/room.js';
+import { signalRoomDeleted } from '../../signals/roomDeleted.js';
 
 dotenv.config();
 
@@ -7,13 +8,7 @@ export const deleteRoom = async (req, res) => {
   const roomId = req.params.roomId;
 
   try {
-    // await ovApi.post('signal', {
-    //   session: roomId,
-    //   type: 'signal:roomDeleted',
-    // });
-
-    // if (sessions[roomId]) await sessions[roomId].close();
-
+    await signalRoomDeleted(roomId);
     await Room.findByIdAndRemove(roomId);
 
     return res.end();

@@ -1,4 +1,5 @@
 import Room from '../../models/room.js';
+import { signalJoinRequestDeclined } from '../../signals/joinRequestDeclined.js';
 
 export const joinRoomDecline = async (req, res) => {
   const roomId = req.params.roomId;
@@ -10,6 +11,8 @@ export const joinRoomDecline = async (req, res) => {
         usersWhoRequestedToJoin: joiningUserId,
       },
     });
+
+    await signalJoinRequestDeclined(roomId, joiningUserId);
 
     return res.status(200).end();
   } catch (err) {
