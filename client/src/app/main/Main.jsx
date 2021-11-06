@@ -1,6 +1,6 @@
 import { Flex } from '@chakra-ui/layout';
 import React from 'react';
-import { useSocket } from '../../core/socketio';
+import { useSocket } from '../../core/query';
 import RoomList from './list/RoomList';
 import Room from './room/Room';
 

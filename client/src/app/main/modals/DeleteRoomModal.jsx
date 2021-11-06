@@ -12,6 +12,7 @@ import React from 'react';
 import { useMutation, useQueryClient } from 'react-query';
 import { useHistory } from 'react-router';
 import { deleteRoom } from '../../../core/api';
+import { roomKeys } from '../../../core/query';
 
 const DeleteRoomModal = props => {
   const { isOpen, onClose, room } = props;
@@ -23,15 +24,18 @@ const DeleteRoomModal = props => {
     onSuccess: () => {
       handleClose();
 
-      queryClient.setQueryData('rooms', old => ({
+      queryClient.setQueryData(roomKeys.list(), old => ({
         rooms: old.rooms.filter(r => r._id !== room._id),
         pending: old.pending,
       }));
-      queryClient.removeQueries(['room', room._id]);
+
+      queryClient.removeQueries(roomKeys.info(room._id));
 
       history.push('/');
     },
   });
+
+  const handleMutate = () => mutation.mutate();
 
   const handleClose = () => {
     onClose();
@@ -49,7 +53,7 @@ const DeleteRoomModal = props => {
         </ModalBody>
         <ModalFooter>
           <Button
-            onClick={mutation.mutate}
+            onClick={handleMutate}
             isLoading={mutation.isLoading}
             colorScheme="red"
             mr={3}

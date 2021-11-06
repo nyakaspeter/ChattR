@@ -4,7 +4,7 @@ import ReactDOM from 'react-dom';
 import { QueryClientProvider } from 'react-query';
 import { BrowserRouter } from 'react-router-dom';
 import App from './app/App';
-import { queryClient } from './core/api';
+import { queryClient } from './core/query';
 import reportWebVitals from './reportWebVitals';
 import * as serviceWorker from './serviceWorker';
 import theme from './setupTheme';

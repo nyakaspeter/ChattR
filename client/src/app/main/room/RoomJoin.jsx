@@ -16,6 +16,7 @@ import React, { useState } from 'react';
 import { useMutation, useQueryClient } from 'react-query';
 import { useHistory } from 'react-router';
 import { joinRoom, joinRoomCancel } from '../../../core/api';
+import { roomKeys } from '../../../core/query';
 
 const RoomJoin = props => {
   const { room, ...rest } = props;
@@ -29,8 +30,8 @@ const RoomJoin = props => {
     ({ roomId, password }) => joinRoom(roomId, { password }),
     {
       onSuccess: () => {
-        queryClient.invalidateQueries('rooms');
-        queryClient.invalidateQueries(['room', room._id]);
+        queryClient.invalidateQueries(roomKeys.list());
+        queryClient.invalidateQueries(roomKeys.info(room._id));
       },
       onError: () => {
         formik.errors.password = 'The password you entered is incorrect';
@@ -40,8 +41,8 @@ const RoomJoin = props => {
 
   const cancelMutation = useMutation(roomId => joinRoomCancel(roomId), {
     onSuccess: () => {
-      queryClient.invalidateQueries('rooms');
-      queryClient.invalidateQueries(['room', room._id]);
+      queryClient.invalidateQueries(roomKeys.list());
+      queryClient.invalidateQueries(roomKeys.info(room._id));
 
       history.push('/');
     },

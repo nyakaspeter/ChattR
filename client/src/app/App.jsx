@@ -2,7 +2,7 @@ import React from 'react';
 import { Redirect } from 'react-router';
 import { Route, Switch } from 'react-router-dom';
 import { Loading } from '../components/Loading';
-import { useUser } from '../core/api';
+import { useUser } from '../core/query';
 import Login from './login/Login';
 import Main from './main/Main';
 import Register from './register/Register';

@@ -16,7 +16,7 @@ import { HiChatAlt2 } from 'react-icons/hi';
 import { ImExit } from 'react-icons/im';
 import { IoMdInformationCircle, IoMdPeople } from 'react-icons/io';
 import { MdCall, MdDelete, MdEdit } from 'react-icons/md';
-import { useUser } from '../../../core/api';
+import { useUser } from '../../../core/query';
 import Messages from '../message/Messages';
 import CreateOrEditRoomModal from '../modals/CreateOrEditRoomModal';
 import DeleteRoomModal from '../modals/DeleteRoomModal';

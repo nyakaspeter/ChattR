@@ -5,6 +5,7 @@ import { Box, HStack, Text, VStack } from '@chakra-ui/layout';
 import React from 'react';
 import { useMutation, useQueryClient } from 'react-query';
 import { joinRoomAccept, joinRoomDecline } from '../../../core/api';
+import { roomKeys } from '../../../core/query';
 
 const RoomUsers = props => {
   const { room, ...rest } = props;
@@ -15,7 +16,7 @@ const RoomUsers = props => {
     ({ roomId, userId }) => joinRoomAccept(roomId, userId),
     {
       onSuccess: () => {
-        queryClient.invalidateQueries(['room', room._id]);
+        queryClient.invalidateQueries(roomKeys.info(room._id));
       },
     }
   );
@@ -24,7 +25,7 @@ const RoomUsers = props => {
     ({ roomId, userId }) => joinRoomDecline(roomId, userId),
     {
       onSuccess: () => {
-        queryClient.invalidateQueries(['room', room._id]);
+        queryClient.invalidateQueries(roomKeys.info(room._id));
       },
     }
   );

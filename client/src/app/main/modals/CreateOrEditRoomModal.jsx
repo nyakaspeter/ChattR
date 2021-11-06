@@ -25,6 +25,7 @@ import { FaUsers } from 'react-icons/fa';
 import { MdDelete, MdLock, MdPhotoCamera, MdPublic } from 'react-icons/md';
 import { useMutation, useQueryClient } from 'react-query';
 import { createRoom, updateRoom } from '../../../core/api';
+import { roomKeys } from '../../../core/query';
 
 const privacyOptions = {
   public: {
@@ -84,7 +85,7 @@ const CreateOrEditRoomModal = props => {
             lastActivity: data.lastActivity,
           };
 
-          queryClient.setQueryData('rooms', old => ({
+          queryClient.setQueryData(roomKeys.list(), old => ({
             rooms: [...old.rooms, newRoom],
             pending: old.pending,
           }));

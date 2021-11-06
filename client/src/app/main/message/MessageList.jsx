@@ -4,7 +4,7 @@ import { VStack } from '@chakra-ui/layout';
 import { Fade } from '@chakra-ui/transition';
 import React, { useEffect, useRef, useState } from 'react';
 import { ScrollView } from '../../../components/ScrollView';
-import { useMessages, useUser } from '../../../core/api';
+import { useMessages, useUser } from '../../../core/query';
 import MessageListItem from './MessageListItem';
 
 const MessageList = props => {

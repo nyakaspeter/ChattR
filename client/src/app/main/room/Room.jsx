@@ -1,7 +1,7 @@
 import { HStack, VStack } from '@chakra-ui/layout';
 import React, { useEffect, useState } from 'react';
 import { Redirect, useParams } from 'react-router';
-import { useRoom } from '../../../core/api';
+import { useRoom } from '../../../core/query';
 import Messages from '../message/Messages';
 import SidePanel from '../sidepanel/SidePanel';
 import RoomHeader from './RoomHeader';

@@ -72,6 +72,7 @@ const MessageForm = props => {
     files.forEach(file => formData.append('files', file));
     formData.append('text', trimmedText);
 
+    // TODO MUTATION
     sendMessage(room._id, formData);
 
     setText('');

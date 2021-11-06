@@ -1,9 +1,6 @@
 import axios from 'axios';
-import { QueryClient, useQuery } from 'react-query';
 
 const api = axios.create({ baseURL: '/api' });
-
-export const queryClient = new QueryClient();
 
 export async function getUser() {
   return (await api.get('user')).data;
@@ -60,29 +57,3 @@ export async function sendMessage(roomId, messageFormData) {
 export async function getSessionToken(roomId) {
   return (await api.get(`room/${roomId}/token`)).data;
 }
-
-export const useUser = () => {
-  const queryOptions = {
-    refetchOnWindowFocus: false,
-    refetchOnmount: false,
-    refetchOnReconnect: false,
-    retry: false,
-    staleTime: Infinity,
-  };
-
-  return useQuery('user', () => getUser(), queryOptions);
-};
-
-export const useRooms = () => useQuery('rooms', () => getRooms());
-
-export const useRoom = roomId =>
-  useQuery(['room', roomId], () => getRoom(roomId), {
-    enabled: !!roomId,
-    retry: (failureCount, error) =>
-      failureCount < 3 &&
-      error.response?.status !== 403 &&
-      error.response?.status !== 404,
-  });
-
-export const useMessages = roomId =>
-  useQuery(['room', roomId, 'messages'], () => getMessages(roomId));

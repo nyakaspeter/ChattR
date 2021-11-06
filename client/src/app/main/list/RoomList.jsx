@@ -5,7 +5,7 @@ import { Fade } from '@chakra-ui/transition';
 import React, { useMemo, useState } from 'react';
 import { Redirect, useParams } from 'react-router';
 import { ScrollView } from '../../../components/ScrollView';
-import { useRooms } from '../../../core/api';
+import { useRooms } from '../../../core/query';
 import RoomListHeader from './RoomListHeader';
 import RoomListItem from './RoomListItem';
 

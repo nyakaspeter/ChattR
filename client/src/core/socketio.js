@@ -1,6 +1,5 @@
-import { useQuery } from 'react-query';
 import io from 'socket.io-client';
-import { queryClient } from './api';
+import { queryClient, roomKeys, socketKeys } from './query';
 
 let socket;
 
@@ -21,13 +20,13 @@ export async function wsConnect() {
   });
 
   socket.on('disconnect', () => {
-    queryClient.invalidateQueries('socket');
+    queryClient.invalidateQueries(socketKeys.current());
   });
 
   socket.on('message', async e => {
-    await queryClient.cancelQueries(['room', e.roomId, 'messages']);
+    await queryClient.cancelQueries(roomKeys.messageList(e.roomId));
 
-    queryClient.setQueryData(['room', e.roomId, 'messages'], old => {
+    queryClient.setQueryData(roomKeys.messageList(e.roomId), old => {
       if (old) {
         const message = old.find(message => message._id === e.message._id);
         return message ? old : [...old, e.message];
@@ -35,8 +34,10 @@ export async function wsConnect() {
       return [e.message];
     });
 
-    queryClient.setQueryData('rooms', old => {
+    queryClient.setQueryData(roomKeys.list(), old => {
       const rooms = old.rooms;
+      const pending = old.pending;
+
       const lastMessage = { ...e.message };
       lastMessage.sender = e.sender;
 
@@ -44,11 +45,7 @@ export async function wsConnect() {
       room.lastMessage = lastMessage;
       room.lastActivity = e.message.date;
 
-      return { rooms, pending: old.pending };
+      return { rooms, pending };
     });
   });
 }
-
-export const useSocket = () => {
-  return useQuery('socket', () => wsConnect());
-};
