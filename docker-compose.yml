@@ -1,0 +1,43 @@
+version: '3'
+
+services:
+  mongo:
+    image: mongo
+    restart: always
+    ports:
+      - ${MONGODB_PORT}:27017
+  server:
+    depends_on:
+      - mongo
+    build:
+      context: .
+      dockerfile: ./server/Dockerfile
+    image: chattr-server
+    restart: always
+    ports:
+      - ${SERVER_PORT}:${SERVER_PORT}
+    environment:
+      NODE_ENV: production
+      PORT: ${SERVER_PORT}
+      SESSION_SECRET: ${SESSION_SECRET}
+      MONGODB_URL: mongodb://mongo:${MONGODB_PORT}/${MONGODB_COLLECTION_NAME}
+      MONGODB_UPLOAD_BUCKET_NAME: ${MONGODB_UPLOAD_BUCKET_NAME}
+      MONGODB_UPLOAD_MAX_FILE_SIZE: ${MONGODB_UPLOAD_MAX_FILE_SIZE}
+      OPENVIDU_URL: http://localhost:5443
+      OPENVIDU_SECRET: ${OPENVIDU_SECRET}
+      GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID}
+      GOOGLE_CLIENT_SECRET: ${GOOGLE_CLIENT_SECRET}
+  client:
+    depends_on:
+      - server
+    build:
+      context: .
+      dockerfile: ./client/Dockerfile
+    image: chattr-client
+    restart: always
+    ports:
+      - 5442:${NGINX_PORT}
+    environment:
+      PORT: ${NGINX_PORT}
+      SERVER_URL: http://server:${SERVER_PORT}
+      MAX_BODY_SIZE: ${MONGODB_UPLOAD_MAX_FILE_SIZE}

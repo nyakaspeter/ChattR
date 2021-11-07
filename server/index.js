@@ -11,8 +11,6 @@ import routes from './routes/index.js';
 
 dotenv.config();
 
-process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
-
 const PORT = process.env.PORT || 5000;
 const SESSION_SECRET = process.env.SESSION_SECRET;
 
