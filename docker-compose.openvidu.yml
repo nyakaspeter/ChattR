@@ -5,26 +5,24 @@ services:
     image: mongo
     command: mongod --port ${MONGODB_PORT}
     restart: always
-    ports:
-      - ${MONGODB_PORT}:${MONGODB_PORT}
+    network_mode: host
   server:
     depends_on:
       - mongo
     build:
-      context: .
+      context: ./ChattR
       dockerfile: ./server/Dockerfile
     image: chattr-server
     restart: always
-    ports:
-      - ${SERVER_PORT}:${SERVER_PORT}
+    network_mode: host
     environment:
       NODE_ENV: production
       PORT: ${SERVER_PORT}
       SESSION_SECRET: ${SESSION_SECRET}
-      MONGODB_URL: mongodb://mongo:${MONGODB_PORT}/${MONGODB_COLLECTION_NAME}
+      MONGODB_URL: mongodb://localhost:${MONGODB_PORT}/${MONGODB_COLLECTION_NAME}
       MONGODB_UPLOAD_BUCKET_NAME: ${MONGODB_UPLOAD_BUCKET_NAME}
       MONGODB_UPLOAD_MAX_FILE_SIZE: ${UPLOAD_MAX_FILE_SIZE}
-      OPENVIDU_URL: ${OPENVIDU_URL}
+      OPENVIDU_URL: http://localhost:5443
       OPENVIDU_SECRET: ${OPENVIDU_SECRET}
       GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID}
       GOOGLE_CLIENT_SECRET: ${GOOGLE_CLIENT_SECRET}
@@ -32,13 +30,12 @@ services:
     depends_on:
       - server
     build:
-      context: .
+      context: ./ChattR
       dockerfile: ./client/Dockerfile
     image: chattr-client
     restart: always
-    ports:
-      - ${NGINX_PORT}:${NGINX_PORT}
+    network_mode: host
     environment:
-      PORT: ${NGINX_PORT}
-      SERVER_URL: http://server:${SERVER_PORT}
+      PORT: 5442
+      SERVER_URL: http://localhost:${SERVER_PORT}
       MAX_BODY_SIZE: ${UPLOAD_MAX_FILE_SIZE}
