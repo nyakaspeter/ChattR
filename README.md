@@ -10,7 +10,7 @@ The video & voice in calls in ChattR are handled by the open source [OpenVidu](h
 
 ## Deployment
 
-<details><summary>How to deploy for development</summary>
+### How to deploy for development
 
 ChattR is a [Node.js](https://nodejs.org/) application at it's core, and uses [yarn](https://yarnpkg.com/) for package management, so install those respectively.
 
@@ -29,9 +29,7 @@ When you have MongoDB and OpenVidu ready, you can start up the development envir
   - `yarn dev` (from the repo root folder)
   - If you use VSCode you can also use one of the pre-defined tasks to start the client, the server or both
 
-</details>
-
-<details><summary>How to deploy for production as standalone application</summary>
+### How to deploy for production as standalone application
 
 You can deploy ChattR as a standalone application with docker-compose. If you want to be able to make video & voice calls using ChattR, you must first [deploy OpenVidu platform](https://docs.openvidu.io/en/2.20.0/deployment/) on premise, or to the cloud. The OpenVidu Call application is not needed, you can disable that.
 
@@ -44,9 +42,7 @@ When you have OpenVidu ready, you can deploy ChattR following these steps:
 - Once the variables are set up properly, you can spin up ChattR with docker-compose
   - `docker-compose up` (from the repo root folder)
 
-</details>
-
-<details><summary>How to deploy for production as OpenVidu based application</summary>
+### How to deploy for production as OpenVidu based application
 
 You can deploy ChattR alongside OpenVidu platform using the same port and SSL certificate. This way you don't have to configure the connection between the two applications and they share the same lifecycle.
 
@@ -75,5 +71,3 @@ The steps of deployment are the following (you can issue these commands on basic
   - Start: `./openvidu start`
   - Stop: `./openvidu stop`
   - Restart: `./openvidu restart`
-
-</details>
