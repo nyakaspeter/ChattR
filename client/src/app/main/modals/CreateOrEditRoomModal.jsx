@@ -102,6 +102,7 @@ const CreateOrEditRoomModal = props => {
   const imageUrl = useRef(initialImageUrl);
 
   const formik = useFormik({
+    enableReinitialize: true,
     initialValues: {
       image: hasImage ? 'unchanged' : null,
       name: editing ? room.name : '',
