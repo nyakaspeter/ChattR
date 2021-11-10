@@ -35,7 +35,7 @@ export async function wsConnect() {
     };
 
     socket.on('*', (event, data) => {
-      console.log(event, data);
+      console.log(`MSG ${event}`, data);
     });
 
     return socket;

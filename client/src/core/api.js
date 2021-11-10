@@ -2,6 +2,12 @@ import axios from 'axios';
 
 const api = axios.create({ baseURL: '/api' });
 
+// Setup debug logging
+api.interceptors.response.use(res => {
+  console.log(`${res.config.method.toUpperCase()} ${res.config.url}`, res.data);
+  return res;
+});
+
 export async function getUser() {
   return (await api.get('user')).data;
 }
