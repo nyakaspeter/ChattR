@@ -17,6 +17,7 @@ import { ImExit } from 'react-icons/im';
 import { IoMdInformationCircle, IoMdPeople } from 'react-icons/io';
 import { MdCall, MdDelete, MdEdit } from 'react-icons/md';
 import { useUser } from '../../../core/query';
+import CallSetup from '../call/CallSetup';
 import Messages from '../message/Messages';
 import CreateOrEditRoomModal from '../modals/CreateOrEditRoomModal';
 import DeleteRoomModal from '../modals/DeleteRoomModal';
@@ -51,7 +52,7 @@ const RoomHeader = props => {
   } = useDisclosure();
 
   const handleOpenCallPanel = () => {
-    onOpenPanel({ title: 'Call', content: Box });
+    onOpenPanel({ title: 'Call', content: CallSetup });
   };
 
   const handleOpenMessagesPanel = () => {
