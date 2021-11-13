@@ -54,11 +54,12 @@ const socketio = {
       socket.emit(event, args)
     );
   },
-  emitToRoom: async function (roomId, event, args) {
+  emitToRoom: async function (roomId, event, args, except) {
     const room = await Room.findById(roomId, 'users').lean();
-    room?.users.forEach(userId =>
-      this.emitToUser(userId, event, { roomId, ...args })
-    );
+    room?.users.forEach(userId => {
+      if (userId.equals(except)) return;
+      this.emitToUser(userId, event, { roomId, ...args });
+    });
   },
 };
 

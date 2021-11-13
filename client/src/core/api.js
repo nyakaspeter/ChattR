@@ -60,6 +60,10 @@ export async function sendMessage(roomId, messageFormData) {
   return (await api.post(`room/${roomId}/message/send`, messageFormData)).data;
 }
 
-export async function getSessionToken(roomId) {
+export async function getRoomSession(roomId) {
+  return (await api.get(`room/${roomId}/session`)).data;
+}
+
+export async function getRoomToken(roomId) {
   return (await api.get(`room/${roomId}/token`)).data;
 }

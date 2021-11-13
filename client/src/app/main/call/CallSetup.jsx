@@ -10,111 +10,112 @@ import {
   MdCall,
   MdMic,
   MdMicOff,
+  MdRefresh,
   MdVideocam,
   MdVideocamOff,
   MdVolumeOff,
   MdVolumeUp,
 } from 'react-icons/md';
+import {
+  RiCheckboxBlankCircleLine,
+  RiCheckboxCircleFill,
+} from 'react-icons/ri';
+import { useMutation } from 'react-query';
 import { openvidu } from '../../../core/openvidu';
+import { useOpenViduSession, useOpenViduToken } from '../../../core/query';
+import { useCallSettings } from '../../../core/store';
 import { getMediaDevices } from '../../../core/utils';
 
 const CallSetup = props => {
+  const { room, ...rest } = props;
+
   const optionBgColor = useColorModeValue('gray.100', 'whiteAlpha.50');
 
-  const [loadingDevices, setLoadingDevices] = useState(true);
-  const [microphones, setMicrophones] = useState([]);
-  const [cameras, setCameras] = useState([]);
-  const [selectedDevices, setSelectedDevices] = useState({
-    camera: '',
-    microphone: '',
-  });
-  const [micVolume, setMicVolume] = useState(-Infinity);
+  const callSettings = useCallSettings();
+  const callSession = useOpenViduSession(room._id, { enabled: false });
+  const callToken = useOpenViduToken(room._id);
+  const mutation = useMutation(callToken.refetch);
 
-  const [camEnabled, setCamEnabled] = useState(true);
-  const [micEnabled, setMicEnabled] = useState(true);
-  const [soundEnabled, setSoundEnabled] = useState(false);
+  const [loadingDevices, setLoadingDevices] = useState(true);
+  const [cameras, setCameras] = useState([]);
+  const [microphones, setMicrophones] = useState([]);
+
+  const [testMic, setTestMic] = useState(false);
+  const [micVolume, setMicVolume] = useState(-Infinity);
 
   const publisher = useRef();
   const video = useRef();
 
-  const toggleCam = e => {
-    setCamEnabled(e.target.checked);
+  const toggleCam = e => callSettings.camEnabled.set(e.target.checked);
+  const toggleMic = e => callSettings.micEnabled.set(e.target.checked);
+  const toggleSound = e => callSettings.soundEnabled.set(e.target.checked);
+  const toggleTestMic = () => setTestMic(!testMic);
 
-    if (publisher.current) {
-      publisher.current.publishVideo(e.target.checked);
-    }
-  };
+  const handleMicrophoneChange = e =>
+    callSettings.selectedMic.set(e.target.value);
+  const handleCameraChange = e => callSettings.selectedCam.set(e.target.value);
+  const handleReloadDevices = async () => await loadDevices();
+  const handleStartCall = () => mutation.mutate();
 
-  const toggleMic = e => {
-    setMicEnabled(e.target.checked);
+  const loadDevices = async () => {
+    setLoadingDevices(true);
 
-    if (publisher.current) {
-      publisher.current.publishAudio(e.target.checked);
-    }
-  };
+    const devices = await getMediaDevices();
+    setMicrophones(devices.audioInputs);
+    setCameras(devices.videoInputs);
 
-  const toggleSound = e => {
-    setSoundEnabled(e.target.checked);
+    callSettings.batch(settings => {
+      if (devices.videoInputs.length === 0) {
+        settings.camEnabled.set(false);
+        settings.selectedCam.set('');
+      } else {
+        const camFound = !!devices.videoInputs.find(
+          i => i.deviceId === settings.selectedCam.value
+        );
+        if (!camFound) {
+          settings.camEnabled.set(true);
+          settings.selectedCam.set(devices.videoInputs[0].deviceId);
+        }
+      }
 
-    if (publisher.current) {
-      publisher.current.videoReference.muted = !e.target.checked;
-    }
-  };
-
-  const handleMicrophoneChange = e => {
-    setSelectedDevices({
-      camera: selectedDevices.camera,
-      microphone: e.target.value,
+      if (devices.audioInputs.length === 0) {
+        settings.micEnabled.set(false);
+        settings.selectedMic.set('');
+      } else {
+        const micFound = !!devices.audioInputs.find(
+          i => i.deviceId === settings.selectedMic.value
+        );
+        if (!micFound) {
+          settings.micEnabled.set(true);
+          settings.selectedMic.set(devices.audioInputs[0].deviceId);
+        }
+      }
     });
+
+    setLoadingDevices(false);
   };
 
-  const handleCameraChange = e => {
-    setSelectedDevices({
-      camera: e.target.value,
-      microphone: selectedDevices.microphone,
+  const initPublisher = async () => {
+    publisher.current = await openvidu.initPublisherAsync(undefined, {
+      publishVideo: callSettings.camEnabled.value,
+      publishAudio: callSettings.micEnabled.value,
+      videoSource: callSettings.selectedCam.value || false,
+      audioSource: callSettings.selectedMic.value || false,
     });
-  };
 
-  const updateStream = async () => {
-    if (!selectedDevices.camera && !selectedDevices.microphone) return;
-
-    if (!publisher.current) {
-      publisher.current = await openvidu.initPublisherAsync(undefined, {
-        publishVideo: camEnabled,
-        publishAudio: micEnabled,
-        videoSource: selectedDevices.camera || false,
-        audioSource: selectedDevices.microphone || false,
-      });
+    try {
       publisher.current.addVideoElement(video.current);
-
-      publisher.current.on('streamAudioVolumeChange', e =>
-        setMicVolume(e.value.newValue)
-      );
-    } else {
-      await openvidu
-        .getUserMedia({
-          videoSource: selectedDevices.camera || false,
-          audioSource: selectedDevices.microphone || false,
-        })
-        .then(async stream => {
-          const videoTracks = stream.getVideoTracks();
-          const audioTracks = stream.getAudioTracks();
-
-          if (videoTracks.length > 0)
-            await publisher.current.replaceTrack(videoTracks[0]);
-          if (audioTracks.length > 0)
-            await publisher.current.replaceTrack(audioTracks[0]);
-
-          publisher.current.off('streamAudioVolumeChange');
-          publisher.current.on('streamAudioVolumeChange', e =>
-            setMicVolume(e.value.newValue)
-          );
-          publisher.current.videoReference.muted = !soundEnabled;
-        });
+    } catch (err) {
+      console.error('Failed to add video element', err);
+      destroyPublisher();
     }
+
+    publisher.current.on('streamAudioVolumeChange', e =>
+      setMicVolume(e.value.newValue)
+    );
   };
 
-  const stopStream = () => {
+  const destroyPublisher = () => {
     if (publisher.current) {
       publisher.current.off('streamAudioVolumeChange');
       publisher.current.stream
@@ -124,32 +125,77 @@ const CallSetup = props => {
     }
   };
 
+  const updateStream = async () => {
+    if (!callSettings.selectedCam.value && !callSettings.selectedMic.value)
+      return;
+
+    if (!publisher.current) {
+      await initPublisher();
+    } else {
+      await openvidu
+        .getUserMedia({
+          videoSource: callSettings.selectedCam.value || false,
+          audioSource: callSettings.selectedMic.value || false,
+        })
+        .then(async stream => {
+          const videoTracks = stream.getVideoTracks();
+          const audioTracks = stream.getAudioTracks();
+
+          if (
+            !publisher.current.stream.hasVideo ||
+            !publisher.current.stream.hasAudio
+          ) {
+            // Have to create a new publisher to add/remove tracks
+            destroyPublisher();
+            await initPublisher();
+          } else {
+            if (videoTracks.length > 0 && publisher.current.stream.hasVideo)
+              await publisher.current.replaceTrack(videoTracks[0]);
+            if (audioTracks.length > 0 && publisher.current.stream.hasAudio)
+              await publisher.current.replaceTrack(audioTracks[0]);
+
+            publisher.current.off('streamAudioVolumeChange');
+            publisher.current.on('streamAudioVolumeChange', e =>
+              setMicVolume(e.value.newValue)
+            );
+            // Have to set it again manually because of a bug
+            publisher.current.videoReference.muted = !testMic;
+          }
+        });
+    }
+  };
+
   useEffect(async () => {
-    const devices = await getMediaDevices();
-    setMicrophones(devices.audioInputs);
-    setCameras(devices.videoInputs);
-    setSelectedDevices({
-      camera: devices.videoInputs[0]?.deviceId || '',
-      microphone: devices.audioInputs[0]?.deviceId || '',
-    });
-    setLoadingDevices(false);
+    await loadDevices();
   }, []);
 
   useEffect(async () => {
     await updateStream();
-  }, [selectedDevices]);
+  }, [callSettings.selectedCam.value, callSettings.selectedMic.value]);
+
+  useEffect(() => {
+    publisher.current?.publishVideo(callSettings.camEnabled.value);
+  }, [callSettings.camEnabled.value]);
+
+  useEffect(() => {
+    publisher.current?.publishAudio(callSettings.micEnabled.value);
+  }, [callSettings.micEnabled.value]);
+
+  useEffect(() => {
+    if (publisher.current) publisher.current.videoReference.muted = !testMic;
+  }, [testMic]);
 
   useLayoutEffect(() => {
     // Stop media stream on unmount
     return () => {
-      stopStream();
+      destroyPublisher();
     };
   }, []);
 
   return (
-    <VStack px={3} spacing={4} alignItems="stretch">
+    <VStack {...rest} px={3} pb={2} spacing={4} alignItems="stretch">
       <Box
-        bg="blackAlpha.800"
+        bg="black"
         w="100%"
         pt="75%"
         borderRadius="lg"
@@ -157,15 +203,18 @@ const CallSetup = props => {
         overflow="hidden"
       >
         <video
-          muted={!soundEnabled}
+          muted={!testMic}
           ref={video}
           style={{
-            top: 0,
-            left: 0,
+            position: 'absolute',
             right: 0,
             bottom: 0,
-            position: 'absolute',
-            display: 'block',
+            minWidth: '100%',
+            minHeight: '100%',
+            width: 'auto',
+            height: 'auto',
+            backgroundSize: 'cover',
+            overflow: 'hidden',
             objectFit: 'cover',
           }}
         />
@@ -176,39 +225,57 @@ const CallSetup = props => {
         )}
       </Box>
       <HStack bg={optionBgColor} py={2.5} px={4} borderRadius="md">
-        {camEnabled ? <MdVideocam size={24} /> : <MdVideocamOff size={24} />}
+        {callSettings.camEnabled.value ? (
+          <MdVideocam size={24} />
+        ) : (
+          <MdVideocamOff size={24} />
+        )}
         <Text flex="1">Camera</Text>
         <Switch
-          defaultChecked={camEnabled}
+          isDisabled={cameras.length === 0}
+          isChecked={callSettings.camEnabled.value}
           onChange={toggleCam}
           colorScheme="green"
         />
       </HStack>
       <HStack bg={optionBgColor} py={2} px={4} borderRadius="md">
-        {micEnabled ? <MdMic size={24} /> : <MdMicOff size={24} />}
+        {callSettings.micEnabled.value ? (
+          <MdMic size={24} />
+        ) : (
+          <MdMicOff size={24} />
+        )}
         <Text flex="1">Microphone</Text>
         <Switch
-          defaultChecked={micEnabled}
+          isDisabled={microphones.length === 0}
+          isChecked={callSettings.micEnabled.value}
           onChange={toggleMic}
           colorScheme="green"
         />
       </HStack>
       <HStack bg={optionBgColor} py={2} px={4} borderRadius="md">
-        {soundEnabled ? <MdVolumeUp size={24} /> : <MdVolumeOff size={24} />}
-        <Text flex="1">Sidetone</Text>
+        {callSettings.soundEnabled.value ? (
+          <MdVolumeUp size={24} />
+        ) : (
+          <MdVolumeOff size={24} />
+        )}
+        <Text flex="1">Sound</Text>
         <Switch
-          defaultChecked={soundEnabled}
+          isChecked={callSettings.soundEnabled.value}
           onChange={toggleSound}
           colorScheme="green"
         />
       </HStack>
       <Select
-        value={selectedDevices.camera}
+        value={callSettings.selectedCam.value}
         onChange={handleCameraChange}
         variant="filled"
       >
-        <option value="" disabled>
-          {cameras.length > 0 ? 'Select camera' : 'Camera not available'}
+        <option value="" disabled={!loadingDevices}>
+          {loadingDevices
+            ? 'Loading devices...'
+            : cameras.length > 0
+            ? 'Select camera'
+            : 'Camera not available'}
         </option>
         {cameras.map(device => (
           <option key={device.deviceId} value={device.deviceId}>
@@ -218,12 +285,14 @@ const CallSetup = props => {
       </Select>
       <VStack alignItems="stretch">
         <Select
-          value={selectedDevices.microphone}
+          value={callSettings.selectedMic.value}
           onChange={handleMicrophoneChange}
           variant="filled"
         >
-          <option value="" disabled>
-            {microphones.length > 0
+          <option value="" disabled={!loadingDevices}>
+            {loadingDevices
+              ? 'Loading devices...'
+              : microphones.length > 0
               ? 'Select microphone'
               : 'Microphone not available'}
           </option>
@@ -240,17 +309,39 @@ const CallSetup = props => {
           colorScheme="green"
         />
       </VStack>
-      <Button
-        alignSelf="center"
-        size="lg"
-        borderRadius="full"
-        colorScheme="green"
-      >
+      <Button onClick={toggleTestMic} borderRadius="full">
         <HStack>
-          <MdCall size={20} />
-          <Text>Start call</Text>
+          {testMic ? (
+            <RiCheckboxCircleFill size={20} />
+          ) : (
+            <RiCheckboxBlankCircleLine size={20} />
+          )}
+
+          <Text>Test microphone</Text>
         </HStack>
       </Button>
+      <Button onClick={handleReloadDevices} borderRadius="full">
+        <HStack>
+          <MdRefresh size={20} />
+          <Text>Reload devices</Text>
+        </HStack>
+      </Button>
+      <Box flex="1" />
+      {!callToken.data?.token && (
+        <Button
+          onClick={handleStartCall}
+          isLoading={mutation.isLoading}
+          alignSelf="center"
+          size="lg"
+          borderRadius="full"
+          colorScheme="green"
+        >
+          <HStack>
+            <MdCall size={20} />
+            <Text>{callSession.data?.active ? 'Join call' : 'Start call'}</Text>
+          </HStack>
+        </Button>
+      )}
     </VStack>
   );
 };

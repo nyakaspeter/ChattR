@@ -53,7 +53,9 @@ const CreateOrEditRoomModal = props => {
   const editing = !!room;
   const hasImage = editing && room.image;
 
-  const initialImageUrl = hasImage ? `/api/room/${room._id}/image` : undefined;
+  const initialImageUrl = hasImage
+    ? `/api/room/${room._id}/image?id=${room.image}`
+    : undefined;
 
   const avatarBgColor = useColorModeValue('gray.300', 'gray.600');
   const avatarOptionsBgColor = useColorModeValue(

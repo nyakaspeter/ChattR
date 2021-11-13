@@ -8,6 +8,7 @@ import { handleRecordingStarted } from './signals/recordingStarted';
 import { handleRecordingStopped } from './signals/recordingStopped';
 import { handleRoomDeleted } from './signals/roomDeleted';
 import { handleRoomUpdated } from './signals/roomUpdated';
+import { handleSessionUpdated } from './signals/sessionUpdated';
 import { handleUserJoined } from './signals/userJoined';
 import { handleUserLeft } from './signals/userLeft';
 import { handleUserOffline } from './signals/userOffline';
@@ -57,6 +58,7 @@ export async function wsConnect() {
   socket.on('recordingStopped', handleRecordingStopped);
   socket.on('roomDeleted', handleRoomDeleted);
   socket.on('roomUpdated', handleRoomUpdated);
+  socket.on('sessionUpdated', handleSessionUpdated);
   socket.on('userJoined', handleUserJoined);
   socket.on('userLeft', handleUserLeft);
   socket.on('userOffline', handleUserOffline);

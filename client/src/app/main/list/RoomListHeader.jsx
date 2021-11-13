@@ -1,11 +1,12 @@
 import { IconButton } from '@chakra-ui/button';
 import { useDisclosure } from '@chakra-ui/hooks';
-import { AddIcon, HamburgerIcon } from '@chakra-ui/icons';
+import { AddIcon, CloseIcon, HamburgerIcon } from '@chakra-ui/icons';
 import { Flex, Heading, HStack } from '@chakra-ui/layout';
 import { Menu, MenuButton, MenuItem, MenuList } from '@chakra-ui/menu';
 import { MenuDivider } from '@chakra-ui/react';
 import React from 'react';
 import { MdLogout, MdSettings } from 'react-icons/md';
+import { useUiState } from '../../../core/store';
 import CreateOrEditRoomModal from '../modals/CreateOrEditRoomModal';
 import SettingsModal from '../modals/SettingsModal';
 
@@ -21,6 +22,9 @@ const RoomListHeader = props => {
     onOpen: openSettingsModal,
     onClose: closeSettingsModal,
   } = useDisclosure();
+
+  const uiState = useUiState();
+  const handleToggleRoomList = () => uiState.showRoomList.set(s => !s);
 
   return (
     <>
@@ -39,7 +43,6 @@ const RoomListHeader = props => {
           <IconButton
             onClick={openCreateRoomModal}
             borderRadius="full"
-            aria-label=""
             icon={<AddIcon />}
           ></IconButton>
           <Menu>
@@ -63,6 +66,9 @@ const RoomListHeader = props => {
               </MenuItem>
             </MenuList>
           </Menu>
+          <IconButton borderRadius="full" onClick={handleToggleRoomList}>
+            <CloseIcon />
+          </IconButton>
         </HStack>
       </Flex>
 

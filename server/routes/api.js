@@ -1,16 +1,17 @@
 import express from 'express';
 import { upload } from '../config/mongoose.js';
+import { getRoomSession } from '../controllers/call/getRoomSession.js';
+import { getRoomToken } from '../controllers/call/getRoomToken.js';
+import { startRecording } from '../controllers/call/startRecording.js';
+import { stopRecording } from '../controllers/call/stopRecording.js';
 import { getMessageFile } from '../controllers/message/getMessageFile.js';
 import { getMessages } from '../controllers/message/getMessages.js';
 import { sendMessage } from '../controllers/message/sendMessage.js';
-import { startRecording } from '../controllers/recording/startRecording.js';
-import { stopRecording } from '../controllers/recording/stopRecording.js';
 import { createRoom } from '../controllers/room/createRoom.js';
 import { deleteRoom } from '../controllers/room/deleteRoom.js';
 import { getRoomImage } from '../controllers/room/getRoomImage.js';
 import { getRoomInfo } from '../controllers/room/getRoomInfo.js';
 import { getRooms } from '../controllers/room/getRooms.js';
-import { getRoomToken } from '../controllers/room/getRoomToken.js';
 import { joinRoom } from '../controllers/room/joinRoom.js';
 import { joinRoomAccept } from '../controllers/room/joinRoomAccept.js';
 import { joinRoomCancel } from '../controllers/room/joinRoomCancel.js';
@@ -57,8 +58,6 @@ router.get('/room/:roomId/info', authorize('roomUser'), getRoomInfo);
 
 router.get('/room/:roomId/image', getRoomImage);
 
-router.get('/room/:roomId/token', authorize('roomUser'), getRoomToken);
-
 router.get('/room/:roomId/messages', authorize('roomUser'), getMessages);
 
 router.post(
@@ -74,15 +73,18 @@ router.get(
   getMessageFile
 );
 
+router.get('/room/:roomId/session', authorize('roomUser'), getRoomSession);
+router.get('/room/:roomId/token', authorize('roomUser'), getRoomToken);
+
 router.get(
   '/room/:roomId/recording/start',
-  authorize('roomUser'),
+  authorize('roomOwner'),
   startRecording
 );
 
 router.post(
   '/room/:roomId/recording/stop',
-  authorize('roomUser'),
+  authorize('roomOwner'),
   stopRecording
 );
 

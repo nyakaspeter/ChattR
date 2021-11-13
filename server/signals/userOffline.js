@@ -9,6 +9,6 @@ export const signalUserOffline = async userId => {
   ).lean();
 
   [...rooms, ...pending].forEach(room =>
-    socketio.emitToRoom(room._id, 'userOffline', { userId })
+    socketio.emitToRoom(room._id, 'userOffline', { userId }, userId)
   );
 };

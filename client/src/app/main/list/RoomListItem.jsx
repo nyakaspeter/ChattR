@@ -24,7 +24,7 @@ const RoomListItem = props => {
       <HStack spacing={3}>
         <Avatar
           name={room.name}
-          src={room.image && `/api/room/${room._id}/image`}
+          src={room.image && `/api/room/${room._id}/image?id=${room.image}`}
         >
           {room.onlineUserCount > 1 && (
             <AvatarBadge boxSize={4} bg="green.400" />

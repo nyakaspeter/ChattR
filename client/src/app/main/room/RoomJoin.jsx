@@ -105,7 +105,7 @@ const RoomJoin = props => {
             <Avatar
               size="2xl"
               name={room.name}
-              src={room.hasImage && `/api/room/${room._id}/image`}
+              src={room.image && `/api/room/${room._id}/image?id=${room.image}`}
             />
             <Heading fontSize="3xl">{room.name}</Heading>
             <HStack>

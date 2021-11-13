@@ -54,7 +54,7 @@ export const authorize = level => async (req, res, next) => {
         privacy: room.privacy,
         userCount: room.users.length,
         onlineUserCount: room.users.filter(u => u.online).length,
-        hasImage: !!room.image,
+        image: room.image,
         status: requested ? 'requestedToJoin' : 'notMember',
       },
     });

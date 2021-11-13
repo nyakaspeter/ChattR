@@ -1,7 +1,8 @@
 import { Avatar } from '@chakra-ui/avatar';
 import { IconButton } from '@chakra-ui/button';
 import { useDisclosure } from '@chakra-ui/hooks';
-import { Badge, Box, Heading, HStack, Text, VStack } from '@chakra-ui/layout';
+import { HamburgerIcon } from '@chakra-ui/icons';
+import { Badge, Box, Heading, HStack, VStack } from '@chakra-ui/layout';
 import {
   Menu,
   MenuButton,
@@ -16,7 +17,9 @@ import { HiChatAlt2 } from 'react-icons/hi';
 import { ImExit } from 'react-icons/im';
 import { IoMdInformationCircle, IoMdPeople } from 'react-icons/io';
 import { MdCall, MdDelete, MdEdit } from 'react-icons/md';
+import ElapsedTimeText from '../../../components/ElapsedTime';
 import { useUser } from '../../../core/query';
+import { useUiState } from '../../../core/store';
 import CallSetup from '../call/CallSetup';
 import Messages from '../message/Messages';
 import CreateOrEditRoomModal from '../modals/CreateOrEditRoomModal';
@@ -26,12 +29,12 @@ import RoomDetails from './RoomDetails';
 import RoomUsers from './RoomUsers';
 
 const RoomHeader = props => {
-  const { room, onOpenPanel, ...rest } = props;
+  const { room, inCall, callSession, ...rest } = props;
 
   const user = useUser();
   const own = user.data._id === room.owner;
 
-  const inCall = false;
+  const uiState = useUiState();
 
   const {
     isOpen: editRoomModalIsOpen,
@@ -51,28 +54,31 @@ const RoomHeader = props => {
     onClose: closeDeleteRoomModal,
   } = useDisclosure();
 
-  const handleOpenCallPanel = () => {
-    onOpenPanel({ title: 'Call', content: CallSetup });
-  };
+  const handleOpenCallPanel = () =>
+    uiState.currentPanel.set({ title: 'Call', content: CallSetup });
 
-  const handleOpenMessagesPanel = () => {
-    onOpenPanel({ title: 'Messages', content: Messages });
-  };
+  const handleOpenMessagesPanel = () =>
+    uiState.currentPanel.set({ title: 'Messages', content: Messages });
 
-  const handleOpenUsersPanel = () => {
-    onOpenPanel({ title: 'Users', content: RoomUsers });
-  };
+  const handleOpenUsersPanel = () =>
+    uiState.currentPanel.set({ title: 'Users', content: RoomUsers });
 
-  const handleOpenDetailsPanel = () => {
-    onOpenPanel({ title: 'Details', content: RoomDetails });
-  };
+  const handleOpenDetailsPanel = () =>
+    uiState.currentPanel.set({ title: 'Details', content: RoomDetails });
+
+  const handleToggleRoomList = () => uiState.showRoomList.set(s => !s);
 
   return (
     <Fade in>
       <HStack {...rest} p={3} spacing={3}>
+        {!uiState.showRoomList.value && (
+          <IconButton onClick={handleToggleRoomList} borderRadius="full">
+            <HamburgerIcon />
+          </IconButton>
+        )}
         <Avatar
           name={room.name}
-          src={room.image && `/api/room/${room._id}/image`}
+          src={room.image && `/api/room/${room._id}/image?id=${room.image}`}
         />
         <Heading fontSize="2xl" noOfLines={1}>
           {room.name}
@@ -84,35 +90,27 @@ const RoomHeader = props => {
             {room.users.filter(u => u.online).length} online
           </Badge>
         </VStack>
-        {!inCall && (
+        {callSession?.active ? (
+          <IconButton
+            onClick={handleOpenCallPanel}
+            borderRadius="full"
+            p={3}
+            colorScheme="green"
+          >
+            <HStack>
+              <MdCall size={20} />
+              <ElapsedTimeText since={callSession?.createdAt} />
+            </HStack>
+          </IconButton>
+        ) : (
           <IconButton onClick={handleOpenCallPanel} borderRadius="full">
             <MdCall size={20} />
           </IconButton>
         )}
         {inCall && (
-          <>
-            <IconButton
-              onClick={handleOpenCallPanel}
-              borderRadius="full"
-              p={3}
-              colorScheme="red"
-            >
-              <HStack>
-                <MdCall size={20} />
-                <Text>14:15</Text>
-              </HStack>
-            </IconButton>
-            {/* <IconButton
-              onClick={handleOpenMessagesPanel}
-              borderRadius="full"
-              color="red.500"
-            >
-              <BsRecordFill size={20} />
-            </IconButton> */}
-            <IconButton onClick={handleOpenMessagesPanel} borderRadius="full">
-              <HiChatAlt2 size={20} />
-            </IconButton>
-          </>
+          <IconButton onClick={handleOpenMessagesPanel} borderRadius="full">
+            <HiChatAlt2 size={20} />
+          </IconButton>
         )}
         <IconButton onClick={handleOpenUsersPanel} borderRadius="full">
           <IoMdPeople size={20} />

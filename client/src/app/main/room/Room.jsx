@@ -1,7 +1,13 @@
 import { HStack, VStack } from '@chakra-ui/layout';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import { Redirect, useParams } from 'react-router';
-import { useRoom } from '../../../core/query';
+import {
+  useOpenViduSession,
+  useOpenViduToken,
+  useRoom,
+} from '../../../core/query';
+import { useUiState } from '../../../core/store';
+import CallScreen from '../call/CallScreen';
 import Messages from '../message/Messages';
 import SidePanel from '../sidepanel/SidePanel';
 import RoomHeader from './RoomHeader';
@@ -10,38 +16,59 @@ import RoomJoin from './RoomJoin';
 const Room = props => {
   const { roomId } = useParams();
 
+  const uiState = useUiState();
+
   const room = useRoom(roomId);
+  const callSession = useOpenViduSession(roomId);
+  const callToken = useOpenViduToken(roomId);
+  const inCall = !!callToken.data?.token;
 
-  const [panel, setPanel] = useState(null);
-  //const [inCall, setInCall] = useState(false);
-
-  const handleOpenPanel = panel => setPanel(panel);
-  const handleClosePanel = () => setPanel(null);
+  useEffect(() => {
+    if (inCall) {
+      // Set sidepanel to messages and hide room list on entering call
+      uiState.showRoomList.set(false);
+      uiState.currentPanel.set({ title: 'Messages', content: Messages });
+    } else {
+      // Close sidepanel and show room list on leaving call
+      uiState.showRoomList.set(true);
+      uiState.currentPanel.set(null);
+    }
+  }, [inCall]);
 
   useEffect(() => {
     // Close sidepanel on switching room
-
-    setPanel(null);
+    uiState.currentPanel.set(null);
   }, [roomId]);
 
   return (
-    <HStack {...props} alignItems="stretch">
+    <HStack {...props} alignItems="stretch" spacing={0}>
       {room.isSuccess && (
         <>
           <VStack flex="2" alignItems="stretch" spacing={0}>
-            <RoomHeader room={room.data} onOpenPanel={handleOpenPanel} />
-            <Messages flex="1" room={room.data} />
+            <RoomHeader
+              room={room.data}
+              inCall={inCall}
+              callSession={callSession.data}
+            />
+            {inCall ? (
+              <CallScreen
+                flex="1"
+                room={room.data}
+                callToken={callToken.data}
+              />
+            ) : (
+              <Messages flex="1" room={room.data} />
+            )}
           </VStack>
 
-          {panel && (
+          {uiState.currentPanel.value && (
             <SidePanel
               flex="1"
               maxWidth="360px"
               borderLeftWidth="1px"
-              title={panel.title}
-              content={panel.content}
+              title={uiState.currentPanel.title.value}
+              content={uiState.currentPanel.content.value}
               room={room.data}
-              onClose={handleClosePanel}
             />
           )}
         </>

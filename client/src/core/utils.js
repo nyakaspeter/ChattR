@@ -12,8 +12,8 @@ export const getMediaDevices = async () => {
         audio: true,
       })
       .then(stream => stream.getTracks().forEach(track => track.stop()));
-  } catch {
-    console.log('Failed to get audio devices');
+  } catch (err) {
+    console.error('Failed to get audio devices', err);
   }
   try {
     await navigator.mediaDevices
@@ -21,8 +21,8 @@ export const getMediaDevices = async () => {
         video: true,
       })
       .then(stream => stream.getTracks().forEach(track => track.stop()));
-  } catch {
-    console.log('Failed to get video devices');
+  } catch (err) {
+    console.error('Failed to get video devices', err);
   }
 
   // Enumerate media devices
@@ -34,9 +34,21 @@ export const getMediaDevices = async () => {
     audioInputs = devices.filter(d => d.kind === 'audioinput');
     audioOutputs = devices.filter(d => d.kind === 'audiooutput');
     videoInputs = devices.filter(d => d.kind === 'videoinput');
-  } catch {
-    console.log('Failed to enumerate media devices');
+  } catch (err) {
+    console.error('Failed to enumerate media devices', err);
   }
 
   return { audioInputs, audioOutputs, videoInputs };
+};
+
+export const toHHMMSS = secs => {
+  var sec_num = parseInt(secs, 10);
+  var hours = Math.floor(sec_num / 3600);
+  var minutes = Math.floor(sec_num / 60) % 60;
+  var seconds = sec_num % 60;
+
+  return [hours, minutes, seconds]
+    .map(v => (v < 10 ? '0' + v : v))
+    .filter((v, i) => v !== '00' || i > 0)
+    .join(':');
 };
