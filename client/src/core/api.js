@@ -67,3 +67,7 @@ export async function getRoomSession(roomId) {
 export async function getRoomToken(roomId) {
   return (await api.get(`room/${roomId}/token`)).data;
 }
+
+export async function hangupCall(roomId) {
+  return (await api.get(`room/${roomId}/hangup`)).data;
+}

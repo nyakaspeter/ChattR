@@ -2,6 +2,7 @@ import { Button, IconButton } from '@chakra-ui/button';
 import { Box, Center, HStack, Text, VStack } from '@chakra-ui/layout';
 import { SlideFade } from '@chakra-ui/transition';
 import React, { useEffect, useRef, useState } from 'react';
+import { useBeforeunload } from 'react-beforeunload';
 import { BsRecordFill } from 'react-icons/bs';
 import {
   MdCallEnd,
@@ -13,7 +14,9 @@ import {
   MdVolumeOff,
   MdVolumeUp,
 } from 'react-icons/md';
-import { useQueryClient } from 'react-query';
+import { useMutation, useQueryClient } from 'react-query';
+import { Prompt } from 'react-router';
+import { hangupCall } from '../../../core/api';
 import { openvidu } from '../../../core/openvidu';
 import { roomKeys } from '../../../core/query';
 import { useCallSettings } from '../../../core/store';
@@ -111,10 +114,13 @@ const CallScreen = props => {
   const toggleMic = () => callSettings.micEnabled.set(e => !e);
   const toggleSound = () => callSettings.soundEnabled.set(e => !e);
 
+  const hangupMutation = useMutation(roomId => hangupCall(roomId));
   const handleHangup = () => {
     session.current.disconnect();
     queryClient.setQueryData(roomKeys.token(room._id), () => {});
+    hangupMutation.mutate(room._id);
   };
+  useBeforeunload(handleHangup);
 
   useEffect(async () => {
     await connectToSession();
@@ -146,53 +152,57 @@ const CallScreen = props => {
     );
 
   return (
-    <Center position="relative" pb={20} {...rest}>
-      <Box m={4} w="100%" h="100%">
-        <VideoGrid videos={[local, ...peers]} spacing={4} />
-      </Box>
+    <>
+      <Center position="relative" pb={20} {...rest}>
+        <Box m={4} w="100%" h="100%">
+          <VideoGrid videos={[local, ...peers]} spacing={4} />
+        </Box>
 
-      <Box position="absolute" bottom={0}>
-        <SlideFade in={showControls} offsetY="20px">
-          <HStack m={4} spacing={4}>
-            <IconButton
-              onClick={handleHangup}
-              size="lg"
-              borderRadius="full"
-              colorScheme="red"
-            >
-              <MdCallEnd size={24} />
-            </IconButton>
-            <IconButton onClick={toggleSound} size="lg" borderRadius="full">
-              {callSettings.soundEnabled.value ? (
-                <MdVolumeUp size={24} />
-              ) : (
-                <MdVolumeOff size={24} />
-              )}
-            </IconButton>
-            <IconButton onClick={toggleMic} size="lg" borderRadius="full">
-              {callSettings.micEnabled.value ? (
-                <MdMic size={24} />
-              ) : (
-                <MdMicOff size={24} />
-              )}
-            </IconButton>
-            <IconButton onClick={toggleCam} size="lg" borderRadius="full">
-              {callSettings.camEnabled.value ? (
-                <MdVideocam size={24} />
-              ) : (
-                <MdVideocamOff size={24} />
-              )}
-            </IconButton>
-            <IconButton size="lg" borderRadius="full">
-              <MdScreenShare size={24} />
-            </IconButton>
-            <IconButton size="lg" borderRadius="full" color="red.500">
-              <BsRecordFill size={24} />
-            </IconButton>
-          </HStack>
-        </SlideFade>
-      </Box>
-    </Center>
+        <Box position="absolute" bottom={0}>
+          <SlideFade in={showControls} offsetY="20px">
+            <HStack m={4} spacing={4}>
+              <IconButton
+                onClick={handleHangup}
+                size="lg"
+                borderRadius="full"
+                colorScheme="red"
+              >
+                <MdCallEnd size={24} />
+              </IconButton>
+              <IconButton onClick={toggleSound} size="lg" borderRadius="full">
+                {callSettings.soundEnabled.value ? (
+                  <MdVolumeUp size={24} />
+                ) : (
+                  <MdVolumeOff size={24} />
+                )}
+              </IconButton>
+              <IconButton onClick={toggleMic} size="lg" borderRadius="full">
+                {callSettings.micEnabled.value ? (
+                  <MdMic size={24} />
+                ) : (
+                  <MdMicOff size={24} />
+                )}
+              </IconButton>
+              <IconButton onClick={toggleCam} size="lg" borderRadius="full">
+                {callSettings.camEnabled.value ? (
+                  <MdVideocam size={24} />
+                ) : (
+                  <MdVideocamOff size={24} />
+                )}
+              </IconButton>
+              <IconButton size="lg" borderRadius="full">
+                <MdScreenShare size={24} />
+              </IconButton>
+              <IconButton size="lg" borderRadius="full" color="red.500">
+                <BsRecordFill size={24} />
+              </IconButton>
+            </HStack>
+          </SlideFade>
+        </Box>
+      </Center>
+
+      <Prompt message={handleHangup} />
+    </>
   );
 };
 

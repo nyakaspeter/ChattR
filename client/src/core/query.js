@@ -50,7 +50,9 @@ export const useUser = options => {
 };
 
 export const useSocket = options => {
-  const queryOptions = {};
+  const queryOptions = {
+    retry: true,
+  };
 
   return useQuery(socketKeys.current(), () => wsConnect(), {
     ...queryOptions,

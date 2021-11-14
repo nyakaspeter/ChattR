@@ -65,7 +65,7 @@ const CreateOrEditRoomModal = props => {
 
   const queryClient = useQueryClient();
 
-  const mutation = useMutation(
+  const createOrEditMutation = useMutation(
     formValues => {
       const formData = Object.keys(formValues).reduce((formData, key) => {
         formData.append(key, formValues[key]);
@@ -137,7 +137,7 @@ const CreateOrEditRoomModal = props => {
 
       return errors;
     },
-    onSubmit: values => mutation.mutate(values),
+    onSubmit: values => createOrEditMutation.mutate(values),
   });
 
   const handleBrowseImage = () => {
@@ -308,7 +308,7 @@ const CreateOrEditRoomModal = props => {
         <ModalFooter>
           <Button
             onClick={formik.handleSubmit}
-            isLoading={mutation.isLoading}
+            isLoading={createOrEditMutation.isLoading}
             colorScheme="blue"
             mr={3}
           >

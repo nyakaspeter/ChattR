@@ -21,8 +21,18 @@ export const ovApi = axios.create({
 });
 
 export const fetchRoomSession = async roomId => {
-  await ovClient.fetch();
-  return ovClient.activeSessions.find(s => s.sessionId === roomId);
+  try {
+    const session = ovClient.activeSessions.find(
+      s => s.sessionId === roomId.toString()
+    );
+    await session.fetch();
+    if (session?.connections?.length === 0 || !session?.createdAt) {
+      return undefined;
+    }
+    return session;
+  } catch {
+    return undefined;
+  }
 };
 
 export const createRoomSession = async roomId => {

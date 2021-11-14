@@ -20,7 +20,7 @@ const LeaveRoomModal = props => {
   const history = useHistory();
   const queryClient = useQueryClient();
 
-  const mutation = useMutation(() => leaveRoom(room._id), {
+  const leaveMutation = useMutation(() => leaveRoom(room._id), {
     onSuccess: () => {
       handleClose();
 
@@ -35,7 +35,7 @@ const LeaveRoomModal = props => {
     },
   });
 
-  const handleMutate = () => mutation.mutate();
+  const handleMutate = () => leaveMutation.mutate();
 
   const handleClose = () => {
     onClose();
@@ -54,7 +54,7 @@ const LeaveRoomModal = props => {
         <ModalFooter>
           <Button
             onClick={handleMutate}
-            isLoading={mutation.isLoading}
+            isLoading={leaveMutation.isLoading}
             colorScheme="red"
             mr={3}
           >

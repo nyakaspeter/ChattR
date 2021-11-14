@@ -20,7 +20,7 @@ const DeleteRoomModal = props => {
   const history = useHistory();
   const queryClient = useQueryClient();
 
-  const mutation = useMutation(() => deleteRoom(room._id), {
+  const deleteMutation = useMutation(() => deleteRoom(room._id), {
     onSuccess: () => {
       handleClose();
 
@@ -35,7 +35,7 @@ const DeleteRoomModal = props => {
     },
   });
 
-  const handleMutate = () => mutation.mutate();
+  const handleMutate = () => deleteMutation.mutate();
 
   const handleClose = () => {
     onClose();
@@ -54,7 +54,7 @@ const DeleteRoomModal = props => {
         <ModalFooter>
           <Button
             onClick={handleMutate}
-            isLoading={mutation.isLoading}
+            isLoading={deleteMutation.isLoading}
             colorScheme="red"
             mr={3}
           >

@@ -26,7 +26,7 @@ const MessageForm = props => {
   const fileBg = useColorModeValue('blackAlpha.100', 'whiteAlpha.100');
   const fileInput = useRef();
 
-  const mutation = useMutation(
+  const sendMutation = useMutation(
     formValues => {
       const trimmedText = formValues.text.trim();
       const formData = new FormData();
@@ -58,7 +58,7 @@ const MessageForm = props => {
       return errors;
     },
     onSubmit: values => {
-      mutation.mutate(values);
+      sendMutation.mutate(values);
       formik.resetForm();
     },
   });
@@ -145,7 +145,7 @@ const MessageForm = props => {
               </IconButton>
               <IconButton
                 onClick={formik.handleSubmit}
-                isLoading={mutation.isLoading}
+                isLoading={sendMutation.isLoading}
                 size="sm"
                 color="gray.500"
                 bg="transparent"

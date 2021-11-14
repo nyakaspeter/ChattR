@@ -34,7 +34,7 @@ const CallSetup = props => {
   const callSettings = useCallSettings();
   const callSession = useOpenViduSession(room._id, { enabled: false });
   const callToken = useOpenViduToken(room._id);
-  const mutation = useMutation(callToken.refetch);
+  const callMutation = useMutation(callToken.refetch);
 
   const [loadingDevices, setLoadingDevices] = useState(true);
   const [cameras, setCameras] = useState([]);
@@ -55,7 +55,7 @@ const CallSetup = props => {
     callSettings.selectedMic.set(e.target.value);
   const handleCameraChange = e => callSettings.selectedCam.set(e.target.value);
   const handleReloadDevices = async () => await loadDevices();
-  const handleStartCall = () => mutation.mutate();
+  const handleStartCall = () => callMutation.mutate();
 
   const loadDevices = async () => {
     setLoadingDevices(true);
@@ -330,7 +330,7 @@ const CallSetup = props => {
       {!callToken.data?.token && (
         <Button
           onClick={handleStartCall}
-          isLoading={mutation.isLoading}
+          isLoading={callMutation.isLoading}
           alignSelf="center"
           size="lg"
           borderRadius="full"

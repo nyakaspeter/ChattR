@@ -26,6 +26,8 @@ export async function wsConnect() {
   socket = io.connect('/');
 
   socket.on('connect', () => {
+    console.log('WebSocket connection estabilished');
+
     // Setup debug logging
     const onevent = socket.onevent;
     socket.onevent = function (packet) {
@@ -42,11 +44,8 @@ export async function wsConnect() {
     return socket;
   });
 
-  socket.on('connect_error', err => {
-    throw err;
-  });
-
   socket.on('disconnect', () => {
+    console.error('WebSocket connection lost');
     queryClient.invalidateQueries(socketKeys.current());
   });
 

@@ -2,6 +2,7 @@ import express from 'express';
 import { upload } from '../config/mongoose.js';
 import { getRoomSession } from '../controllers/call/getRoomSession.js';
 import { getRoomToken } from '../controllers/call/getRoomToken.js';
+import { hangupCall } from '../controllers/call/hangupCall.js';
 import { startRecording } from '../controllers/call/startRecording.js';
 import { stopRecording } from '../controllers/call/stopRecording.js';
 import { getMessageFile } from '../controllers/message/getMessageFile.js';
@@ -75,6 +76,7 @@ router.get(
 
 router.get('/room/:roomId/session', authorize('roomUser'), getRoomSession);
 router.get('/room/:roomId/token', authorize('roomUser'), getRoomToken);
+router.get('/room/:roomId/hangup', authorize('roomUser'), hangupCall);
 
 router.get(
   '/room/:roomId/recording/start',
