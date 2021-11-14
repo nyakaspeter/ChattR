@@ -12,7 +12,7 @@ import {
 import { Textarea } from '@chakra-ui/textarea';
 import { Fade } from '@chakra-ui/transition';
 import { useFormik } from 'formik';
-import React, { useRef } from 'react';
+import React, { useRef, useState } from 'react';
 import { BiSend } from 'react-icons/bi';
 import { FaRegFile } from 'react-icons/fa';
 import { MdAttachFile } from 'react-icons/md';
@@ -25,6 +25,7 @@ const MessageForm = props => {
 
   const fileBg = useColorModeValue('blackAlpha.100', 'whiteAlpha.100');
   const fileInput = useRef();
+  const [showTextArea, setShowTextArea] = useState(false);
 
   const sendMutation = useMutation(
     formValues => {
@@ -106,55 +107,66 @@ const MessageForm = props => {
     );
   };
 
+  const handleShowTextArea = () => setShowTextArea(true);
+
   return (
-    <Fade in>
+    <Fade in onAnimationComplete={handleShowTextArea}>
       <VStack {...rest} p={2} alignItems="stretch">
         <Box position="relative">
-          <Textarea
-            name="text"
-            value={formik.values.text}
-            onChange={handleTextInput}
-            onKeyDown={handleKeyDown}
-            onBlur={handleOnBlur}
-            isInvalid={formik.errors.text}
-            placeholder="Write a message"
-            variant="filled"
-            borderRadius="3xl"
-            pl={10}
-            pr={20}
-            minH="unset"
-            minRows={1}
-            maxRows={20}
-            resize="none"
-            as={ResizeTextarea}
-          />
-          <Center position="absolute" left={0} top={0} h="100%" w={10}>
-            <ChatIcon color="gray.500" />
-          </Center>
-          <Center>
-            <HStack position="absolute" right={1} top={0} h="100%" spacing={2}>
-              <IconButton
-                onClick={handleBrowseFiles}
-                size="sm"
-                color="gray.500"
-                bg="transparent"
-                borderRadius="full"
-                pointerEvents="auto"
+          <Fade in={showTextArea}>
+            <Textarea
+              name="text"
+              value={formik.values.text}
+              onChange={handleTextInput}
+              onKeyDown={handleKeyDown}
+              onBlur={handleOnBlur}
+              isInvalid={formik.errors.text}
+              placeholder="Write a message"
+              variant="filled"
+              borderRadius="3xl"
+              pl={10}
+              pr={20}
+              minH="unset"
+              minRows={1}
+              maxRows={20}
+              resize="none"
+              as={ResizeTextarea}
+            />
+
+            <Center position="absolute" left={0} top={0} h="100%" w={10}>
+              <ChatIcon color="gray.500" />
+            </Center>
+            <Center>
+              <HStack
+                position="absolute"
+                right={1}
+                top={0}
+                h="100%"
+                spacing={2}
               >
-                <MdAttachFile size={24} />
-              </IconButton>
-              <IconButton
-                onClick={formik.handleSubmit}
-                isLoading={sendMutation.isLoading}
-                size="sm"
-                color="gray.500"
-                bg="transparent"
-                borderRadius="full"
-              >
-                <BiSend size={24} />
-              </IconButton>
-            </HStack>
-          </Center>
+                <IconButton
+                  onClick={handleBrowseFiles}
+                  size="sm"
+                  color="gray.500"
+                  bg="transparent"
+                  borderRadius="full"
+                  pointerEvents="auto"
+                >
+                  <MdAttachFile size={24} />
+                </IconButton>
+                <IconButton
+                  onClick={formik.handleSubmit}
+                  isLoading={sendMutation.isLoading}
+                  size="sm"
+                  color="gray.500"
+                  bg="transparent"
+                  borderRadius="full"
+                >
+                  <BiSend size={24} />
+                </IconButton>
+              </HStack>
+            </Center>
+          </Fade>
         </Box>
         <input
           ref={fileInput}

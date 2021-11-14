@@ -72,9 +72,11 @@ const RoomHeader = props => {
     <Fade in>
       <HStack {...rest} p={3} spacing={3}>
         {!uiState.showRoomList.value && (
-          <IconButton onClick={handleToggleRoomList} borderRadius="full">
-            <HamburgerIcon />
-          </IconButton>
+          <Fade in>
+            <IconButton onClick={handleToggleRoomList} borderRadius="full">
+              <HamburgerIcon />
+            </IconButton>
+          </Fade>
         )}
         <Avatar
           name={room.name}

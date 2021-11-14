@@ -19,7 +19,7 @@ const SidePanel = props => {
           <CloseIcon />
         </IconButton>
       </HStack>
-      <Content room={room} flex="1" />
+      {Content && <Content room={room} flex="1" />}
     </VStack>
   );
 };
