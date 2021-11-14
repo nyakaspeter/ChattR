@@ -194,7 +194,7 @@ const CallSetup = props => {
   }, []);
 
   return (
-    <VStack {...rest} px={3} pb={2} spacing={4} alignItems="stretch">
+    <VStack {...rest} px={3} pb={6} spacing={4} alignItems="stretch">
       <Box
         bg="black"
         w="100%"

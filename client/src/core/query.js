@@ -10,6 +10,12 @@ import {
 import { wsConnect } from './socketio';
 
 export const queryClient = new QueryClient();
+queryClient.updateQueryData = (queryKey, updater) => {
+  const dataExists = !!queryClient.getQueryData(queryKey);
+  if (dataExists) {
+    queryClient.setQueryData(queryKey, updater);
+  }
+};
 
 export const userKeys = {
   all: () => ['user'],
@@ -74,11 +80,11 @@ export const useRooms = options => {
 export const useRoom = (roomId, options) => {
   const queryOptions = {
     enabled: !!roomId,
+    refetchOnMount: false,
     retry: (failureCount, error) =>
       failureCount < 3 &&
       error.response?.status !== 403 &&
       error.response?.status !== 404,
-    refetchOnMount: false,
   };
 
   return useQuery(roomKeys.info(roomId), () => getRoom(roomId), {
@@ -89,6 +95,7 @@ export const useRoom = (roomId, options) => {
 
 export const useMessages = (roomId, options) => {
   const queryOptions = {
+    enabled: !!roomId,
     refetchOnMount: false,
   };
 
@@ -101,6 +108,7 @@ export const useMessages = (roomId, options) => {
 export const useOpenViduSession = (roomId, options) => {
   const queryOptions = {
     enabled: !!roomId,
+    refetchOnMount: false,
   };
 
   return useQuery(roomKeys.session(roomId), () => getRoomSession(roomId), {

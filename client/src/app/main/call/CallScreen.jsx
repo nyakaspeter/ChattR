@@ -19,12 +19,15 @@ import { useMutation, useQueryClient } from 'react-query';
 import { Prompt } from 'react-router';
 import { hangupCall } from '../../../core/api';
 import { openvidu } from '../../../core/openvidu';
-import { roomKeys } from '../../../core/query';
+import { roomKeys, useUser } from '../../../core/query';
 import { useCallSettings } from '../../../core/store';
 import VideoGrid from './VideoGrid';
 
 const CallScreen = props => {
   const { room, callToken, ...rest } = props;
+
+  const user = useUser();
+  const own = user.data._id === room.owner;
 
   const [showControls] = useState(true);
   const [screenShare, setScreenShare] = useState(false);
@@ -232,9 +235,11 @@ const CallScreen = props => {
                   <MdScreenShare size={24} />
                 )}
               </IconButton>
-              <IconButton size="lg" borderRadius="full" color="red.500">
-                <BsRecordFill size={24} />
-              </IconButton>
+              {own && (
+                <IconButton size="lg" borderRadius="full" color="red.500">
+                  <BsRecordFill size={24} />
+                </IconButton>
+              )}
             </HStack>
           </SlideFade>
         </Box>

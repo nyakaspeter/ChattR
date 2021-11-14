@@ -1,6 +1,6 @@
 import Room from '../../models/room.js';
+import { signalJoinRequest } from '../../signals/joinRequest.js';
 import { signalUserJoined } from '../../signals/userJoined.js';
-import { signalUserRequestedToJoin } from '../../signals/userRequestedToJoin.js';
 
 export const joinRoom = async (req, res) => {
   const userId = req.user._id;
@@ -32,7 +32,7 @@ export const joinRoom = async (req, res) => {
         $addToSet: { usersWhoRequestedToJoin: userId },
       });
 
-      await signalUserRequestedToJoin(roomId, userId);
+      await signalJoinRequest(roomId, userId);
 
       return res.status(200).end();
     }

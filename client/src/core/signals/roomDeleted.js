@@ -1,8 +1,12 @@
 import { queryClient, roomKeys } from '../query.js';
 
 export const handleRoomDeleted = e => {
-  // TODO: setQueryData instead of refetching
+  queryClient.updateQueryData(roomKeys.list(), old => {
+    return {
+      ...old,
+      rooms: old.rooms.filter(r => r._id !== e.roomId),
+    };
+  });
 
-  queryClient.invalidateQueries(roomKeys.list());
-  queryClient.removeQueries(roomKeys.info(e.roomId));
+  queryClient.refetchQueries(roomKeys.info(e.roomId));
 };

@@ -1,8 +1,7 @@
 import { Avatar } from '@chakra-ui/avatar';
 import { IconButton } from '@chakra-ui/button';
 import { useDisclosure } from '@chakra-ui/hooks';
-import { HamburgerIcon } from '@chakra-ui/icons';
-import { Badge, Box, Heading, HStack, VStack } from '@chakra-ui/layout';
+import { Badge, Box, Circle, Heading, HStack, VStack } from '@chakra-ui/layout';
 import {
   Menu,
   MenuButton,
@@ -66,23 +65,15 @@ const RoomHeader = props => {
   const handleOpenDetailsPanel = () =>
     uiState.currentPanel.set({ title: 'Details', content: RoomDetails });
 
-  const handleToggleRoomList = () => uiState.showRoomList.set(s => !s);
-
   return (
     <Fade in>
       <HStack {...rest} p={3} spacing={3}>
-        {!uiState.showRoomList.value && (
-          <Fade in>
-            <IconButton onClick={handleToggleRoomList} borderRadius="full">
-              <HamburgerIcon />
-            </IconButton>
-          </Fade>
-        )}
         <Avatar
           name={room.name}
           src={room.image && `/api/room/${room._id}/image?id=${room.image}`}
+          ml={!uiState.showRoomList.value && 14}
         />
-        <Heading fontSize="2xl" noOfLines={1}>
+        <Heading fontSize="2xl" noOfLines={1} wordBreak="break-all">
           {room.name}
         </Heading>
         <Box flex="1" />
@@ -114,9 +105,22 @@ const RoomHeader = props => {
             <HiChatAlt2 size={20} />
           </IconButton>
         )}
-        <IconButton onClick={handleOpenUsersPanel} borderRadius="full">
-          <IoMdPeople size={20} />
-        </IconButton>
+        <Box position="relative">
+          <IconButton onClick={handleOpenUsersPanel} borderRadius="full">
+            <IoMdPeople size={20} />
+          </IconButton>
+          {room.usersWhoRequestedToJoin?.length > 0 && (
+            <Circle
+              position="absolute"
+              right={0}
+              bottom={0}
+              size={3}
+              bg="red.500"
+              borderColor="red.300"
+              borderWidth={2}
+            />
+          )}
+        </Box>
         <IconButton onClick={handleOpenDetailsPanel} borderRadius="full">
           <IoMdInformationCircle size={20} />
         </IconButton>

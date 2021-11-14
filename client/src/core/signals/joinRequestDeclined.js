@@ -1,8 +1,12 @@
 import { queryClient, roomKeys } from '../query.js';
 
 export const handleJoinRequestDeclined = e => {
-  // TODO: setQueryData instead of refetching
+  queryClient.updateQueryData(roomKeys.list(), old => {
+    return {
+      ...old,
+      pending: old.pending.filter(r => r._id !== e.roomId),
+    };
+  });
 
-  queryClient.invalidateQueries(roomKeys.list());
   queryClient.invalidateQueries(roomKeys.info(e.roomId));
 };

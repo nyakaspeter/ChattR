@@ -56,7 +56,7 @@ const Video = props => {
           right={1}
           bottom={1}
           borderRadius="lg"
-          boxShadow={'0px 0px 0px 12px var(--chakra-colors-green-500)'}
+          boxShadow="0px 0px 0px 12px var(--chakra-colors-green-400)"
         />
       </Fade>
       <Fade in={loading}>

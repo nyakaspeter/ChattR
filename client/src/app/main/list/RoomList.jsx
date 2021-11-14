@@ -64,7 +64,12 @@ const RoomList = props => {
 
           <ScrollView>
             <Fade in>
-              <VStack px={2} alignItems="stretch" overflow="auto">
+              <VStack
+                px={2}
+                alignItems="stretch"
+                overflowY="auto"
+                overflowX="hidden"
+              >
                 {rooms.data.pending.length > 0 && (
                   <>
                     <Text fontSize="sm" px={2} textTransform="uppercase">

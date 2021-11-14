@@ -3,12 +3,15 @@ import { useColorModeValue } from '@chakra-ui/color-mode';
 import { Flex, HStack, Text, VStack } from '@chakra-ui/layout';
 import React from 'react';
 import { Link } from 'react-router-dom';
+import { useOpenViduSession } from '../../../core/query';
 
 const RoomListItem = props => {
   const { room, selected } = props;
 
-  const selectionColor = useColorModeValue('gray.200', 'gray.600');
-  const hoverColor = useColorModeValue('gray.100', 'gray.700');
+  const selectionColor = useColorModeValue('gray.200', 'whiteAlpha.100');
+  const hoverColor = useColorModeValue('gray.100', 'whiteAlpha.200');
+
+  const callSession = useOpenViduSession(room._id);
 
   return (
     <Flex
@@ -25,6 +28,10 @@ const RoomListItem = props => {
         <Avatar
           name={room.name}
           src={room.image && `/api/room/${room._id}/image?id=${room.image}`}
+          boxShadow={
+            callSession.data?.active &&
+            '0px 0px 0px 3px var(--chakra-colors-green-400)'
+          }
         >
           {room.onlineUserCount > 1 && (
             <AvatarBadge boxSize={4} bg="green.400" />

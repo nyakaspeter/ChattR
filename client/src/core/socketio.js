@@ -1,5 +1,6 @@
 import io from 'socket.io-client';
 import { queryClient, socketKeys } from './query';
+import { handleJoinRequest } from './signals/joinRequest';
 import { handleJoinRequestAccepted } from './signals/joinRequestAccepted';
 import { handleJoinRequestCancelled } from './signals/joinRequestCancelled';
 import { handleJoinRequestDeclined } from './signals/joinRequestDeclined';
@@ -13,7 +14,6 @@ import { handleUserJoined } from './signals/userJoined';
 import { handleUserLeft } from './signals/userLeft';
 import { handleUserOffline } from './signals/userOffline';
 import { handleUserOnline } from './signals/userOnline';
-import { handleUserRequestedToJoin } from './signals/userRequestedToJoin';
 
 let socket;
 
@@ -49,6 +49,7 @@ export async function wsConnect() {
     queryClient.invalidateQueries(socketKeys.current());
   });
 
+  socket.on('joinRequest', handleJoinRequest);
   socket.on('joinRequestAccepted', handleJoinRequestAccepted);
   socket.on('joinRequestCancelled', handleJoinRequestCancelled);
   socket.on('joinRequestDeclined', handleJoinRequestDeclined);
@@ -62,5 +63,4 @@ export async function wsConnect() {
   socket.on('userLeft', handleUserLeft);
   socket.on('userOffline', handleUserOffline);
   socket.on('userOnline', handleUserOnline);
-  socket.on('userRequestedToJoin', handleUserRequestedToJoin);
 }

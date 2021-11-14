@@ -1,7 +1,12 @@
 import { queryClient, roomKeys } from '../query.js';
 
 export const handleJoinRequestCancelled = e => {
-  // TODO: setQueryData instead of refetching
-
-  queryClient.invalidateQueries(roomKeys.info(e.roomId));
+  queryClient.updateQueryData(roomKeys.info(e.roomId), old => {
+    return {
+      ...old,
+      usersWhoRequestedToJoin: old.usersWhoRequestedToJoin.filter(
+        u => u._id !== e.userId
+      ),
+    };
+  });
 };

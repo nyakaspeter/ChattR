@@ -1,8 +1,20 @@
 import { queryClient, roomKeys } from '../query.js';
 
 export const handleUserLeft = e => {
-  // TODO: setQueryData instead of refetching
+  queryClient.updateQueryData(roomKeys.info(e.roomId), old => ({
+    ...old,
+    users: old.users.filter(u => u._id !== e.userId),
+  }));
 
-  queryClient.invalidateQueries(roomKeys.list());
-  queryClient.invalidateQueries(roomKeys.info(e.roomId));
+  queryClient.updateQueryData(roomKeys.list(), old => {
+    const rooms = [...old.rooms];
+    const updatedRoom = rooms.find(r => r._id === e.roomId);
+
+    updatedRoom.onlineUserCount--;
+
+    return {
+      ...old,
+      rooms,
+    };
+  });
 };
