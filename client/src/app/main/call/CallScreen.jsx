@@ -9,6 +9,7 @@ import {
   MdMic,
   MdMicOff,
   MdScreenShare,
+  MdStopScreenShare,
   MdVideocam,
   MdVideocamOff,
   MdVolumeOff,
@@ -26,6 +27,7 @@ const CallScreen = props => {
   const { room, callToken, ...rest } = props;
 
   const [showControls] = useState(true);
+  const [screenShare, setScreenShare] = useState(false);
   const [error, setError] = useState(false);
   const [local, setLocal] = useState();
   const [peers, setPeers] = useState([]);
@@ -64,6 +66,7 @@ const CallScreen = props => {
       publishAudio: callSettings.micEnabled.value,
       videoSource: callSettings.selectedCam.value || false,
       audioSource: callSettings.selectedMic.value || false,
+      mirror: false,
     });
     setLocal(publisher.current);
   };
@@ -80,29 +83,50 @@ const CallScreen = props => {
       } else {
         await openvidu
           .getUserMedia({
-            videoSource: callSettings.selectedCam.value || false,
+            videoSource: screenShare
+              ? 'screen'
+              : callSettings.selectedCam.value || false,
             audioSource: callSettings.selectedMic.value || false,
           })
-          .then(async stream => {
-            const videoTracks = stream.getVideoTracks();
-            const audioTracks = stream.getAudioTracks();
+          .then(
+            async stream => {
+              const videoTracks = stream.getVideoTracks();
+              const audioTracks = stream.getAudioTracks();
 
-            if (
-              !publisher.current.stream.hasVideo ||
-              !publisher.current.stream.hasAudio
-            ) {
-              // TODO: Have to create a new publisher to add/remove tracks
-            } else {
-              if (videoTracks.length > 0 && publisher.current.stream.hasVideo)
-                await publisher.current.replaceTrack(videoTracks[0]);
-              if (audioTracks.length > 0 && publisher.current.stream.hasAudio)
-                await publisher.current.replaceTrack(audioTracks[0]);
+              if (
+                !publisher.current.stream.hasVideo ||
+                !publisher.current.stream.hasAudio
+              ) {
+                // TODO: Have to create a new publisher to add/remove tracks
+              } else {
+                if (videoTracks.length > 0 && publisher.current.stream.hasVideo)
+                  await publisher.current.replaceTrack(videoTracks[0]);
+                if (audioTracks.length > 0 && publisher.current.stream.hasAudio)
+                  await publisher.current.replaceTrack(audioTracks[0]);
 
-              // TODO: Resubscribe to speaking events on the local video
-              // Have to set it again manually because of a bug
-              publisher.current.videoReference.muted = true;
+                // TODO: Resubscribe to speaking events on the local video
+                // Have to set it again manually because of a bug
+                publisher.current.videoReference.muted = true;
+              }
+
+              publisher.current.publishVideo(
+                screenShare ? true : callSettings.camEnabled.value
+              );
+
+              if (screenShare) {
+                publisher.current.stream
+                  .getMediaStream()
+                  .getVideoTracks()[0]
+                  .addEventListener('ended', () => setScreenShare(false));
+              }
+            },
+            error => {
+              if (screenShare) {
+                console.error('Failed to share screen', error);
+                setScreenShare(false);
+              }
             }
-          });
+          );
       }
     } catch (err) {
       console.error('Failed to publish stream', err);
@@ -113,6 +137,7 @@ const CallScreen = props => {
   const toggleCam = () => callSettings.camEnabled.set(e => !e);
   const toggleMic = () => callSettings.micEnabled.set(e => !e);
   const toggleSound = () => callSettings.soundEnabled.set(e => !e);
+  const toggleScreenShare = () => setScreenShare(!screenShare);
 
   const hangupMutation = useMutation(roomId => hangupCall(roomId));
   const handleHangup = () => {
@@ -129,10 +154,16 @@ const CallScreen = props => {
 
   useEffect(async () => {
     await publishStream();
-  }, [callSettings.selectedCam.value, callSettings.selectedMic.value]);
+  }, [
+    callSettings.selectedCam.value,
+    callSettings.selectedMic.value,
+    screenShare,
+  ]);
 
   useEffect(() => {
-    publisher.current?.publishVideo(callSettings.camEnabled.value);
+    publisher.current?.publishVideo(
+      screenShare ? true : callSettings.camEnabled.value
+    );
   }, [callSettings.camEnabled.value]);
 
   useEffect(() => {
@@ -190,8 +221,16 @@ const CallScreen = props => {
                   <MdVideocamOff size={24} />
                 )}
               </IconButton>
-              <IconButton size="lg" borderRadius="full">
-                <MdScreenShare size={24} />
+              <IconButton
+                onClick={toggleScreenShare}
+                size="lg"
+                borderRadius="full"
+              >
+                {screenShare ? (
+                  <MdStopScreenShare size={24} />
+                ) : (
+                  <MdScreenShare size={24} />
+                )}
               </IconButton>
               <IconButton size="lg" borderRadius="full" color="red.500">
                 <BsRecordFill size={24} />

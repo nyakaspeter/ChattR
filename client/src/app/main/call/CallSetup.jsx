@@ -101,6 +101,7 @@ const CallSetup = props => {
       publishAudio: callSettings.micEnabled.value,
       videoSource: callSettings.selectedCam.value || false,
       audioSource: callSettings.selectedMic.value || false,
+      mirror: false,
     });
 
     try {
