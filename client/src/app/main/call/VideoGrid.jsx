@@ -6,7 +6,7 @@ import Video from './Video';
 import './VideoGrid.css';
 
 const VideoGrid = props => {
-  const { videos } = props;
+  const { videos, users } = props;
 
   const { align = 'center', spacing = 2 } = props;
   const updateLayout = useRef();
@@ -29,7 +29,7 @@ const VideoGrid = props => {
     >
       {videos.map((video, i) => (
         <Box key={i} w="100%" h="100%" display="grid">
-          <Video streamManager={video} m={spacing / 2}></Video>
+          <Video streamManager={video} users={users} m={spacing / 2}></Video>
         </Box>
       ))}
     </PackedGrid>

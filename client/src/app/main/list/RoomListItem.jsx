@@ -44,7 +44,8 @@ const RoomListItem = props => {
           {room.lastMessage && (
             <Text fontSize="sm" noOfLines="1" wordBreak="break-all">
               {`${room.lastMessage.sender.name.split(' ')[0]}: ${
-                room.lastMessage.text
+                room.lastMessage.text ||
+                `Sent ${room.lastMessage.files.length} files`
               }`}
             </Text>
           )}

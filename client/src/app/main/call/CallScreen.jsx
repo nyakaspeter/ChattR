@@ -189,7 +189,11 @@ const CallScreen = props => {
     <>
       <Center position="relative" pb={20} {...rest}>
         <Box m={4} w="100%" h="100%">
-          <VideoGrid videos={[local, ...peers]} spacing={4} />
+          <VideoGrid
+            videos={[local, ...peers]}
+            users={room.users}
+            spacing={4}
+          />
         </Box>
 
         <Box position="absolute" bottom={0}>
