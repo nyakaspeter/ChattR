@@ -198,7 +198,7 @@ const CallScreen = props => {
 
         <Box position="absolute" bottom={0}>
           <SlideFade in={showControls} offsetY="20px">
-            <HStack m={4} spacing={4}>
+            <HStack m={4} spacing={4} flexWrap="wrap" justifyContent="center">
               <IconButton
                 onClick={handleHangup}
                 size="lg"

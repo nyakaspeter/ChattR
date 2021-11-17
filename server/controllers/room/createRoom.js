@@ -4,7 +4,8 @@ import Room from '../../models/room.js';
 dotenv.config();
 
 export const createRoom = async (req, res) => {
-  const room = { ...req.body, image: req.file?.id, lastActivity: new Date() };
+  const date = new Date();
+  const room = { ...req.body, image: req.file?.id, lastActivity: date };
   const userId = req.user._id;
 
   try {
@@ -12,6 +13,16 @@ export const createRoom = async (req, res) => {
     newRoom.owner = userId;
     newRoom.users = [userId];
     await newRoom.save();
+
+    await Room.findByIdAndUpdate(newRoom._id, {
+      $push: {
+        messages: {
+          type: 'roomCreated',
+          sender: userId,
+          date,
+        },
+      },
+    });
 
     return res.json(newRoom);
   } catch (err) {

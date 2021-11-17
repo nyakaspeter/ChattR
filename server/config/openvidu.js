@@ -1,7 +1,6 @@
 import axios from 'axios';
 import dotenv from 'dotenv';
 import { OpenVidu } from 'openvidu-node-client';
-import { signalSessionUpdated } from '../signals/sessionUpdated.js';
 
 dotenv.config();
 
@@ -36,10 +35,5 @@ export const fetchRoomSession = async roomId => {
 };
 
 export const createRoomSession = async roomId => {
-  const session = await ovClient.createSession({ customSessionId: roomId });
-  await signalSessionUpdated(roomId, {
-    active: true,
-    createdAt: new Date(session.createdAt),
-  });
-  return session;
+  return await ovClient.createSession({ customSessionId: roomId });
 };

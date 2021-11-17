@@ -2,6 +2,7 @@ import { Avatar } from '@chakra-ui/avatar';
 import { IconButton } from '@chakra-ui/button';
 import { useDisclosure } from '@chakra-ui/hooks';
 import { Badge, Box, Circle, Heading, HStack, VStack } from '@chakra-ui/layout';
+import { useBreakpointValue } from '@chakra-ui/media-query';
 import {
   Menu,
   MenuButton,
@@ -34,6 +35,9 @@ const RoomHeader = props => {
   const own = user.data._id === room.owner;
 
   const uiState = useUiState();
+
+  const showUserCounts = useBreakpointValue({ base: false, sm: true });
+  const showAllButtons = useBreakpointValue({ base: false, md: true });
 
   const {
     isOpen: editRoomModalIsOpen,
@@ -77,12 +81,14 @@ const RoomHeader = props => {
           {room.name}
         </Heading>
         <Box flex="1" />
-        <VStack spacing={1} alignItems="flex-end">
-          <Badge>{room.users.length} users</Badge>
-          <Badge colorScheme="green">
-            {room.users.filter(u => u.online).length} online
-          </Badge>
-        </VStack>
+        {showUserCounts && (
+          <VStack spacing={1} alignItems="flex-end">
+            <Badge>{room.users.length} users</Badge>
+            <Badge colorScheme="green">
+              {room.users.filter(u => u.online).length} online
+            </Badge>
+          </VStack>
+        )}
         {callSession?.active ? (
           <IconButton
             onClick={handleOpenCallPanel}
@@ -100,35 +106,64 @@ const RoomHeader = props => {
             <MdCall size={20} />
           </IconButton>
         )}
-        {inCall && (
-          <IconButton onClick={handleOpenMessagesPanel} borderRadius="full">
-            <HiChatAlt2 size={20} />
-          </IconButton>
+
+        {showAllButtons && (
+          <>
+            {inCall && (
+              <IconButton onClick={handleOpenMessagesPanel} borderRadius="full">
+                <HiChatAlt2 size={20} />
+              </IconButton>
+            )}
+            <Box position="relative">
+              <IconButton onClick={handleOpenUsersPanel} borderRadius="full">
+                <IoMdPeople size={20} />
+              </IconButton>
+              {room.usersWhoRequestedToJoin?.length > 0 && (
+                <Circle
+                  position="absolute"
+                  right={0}
+                  bottom={0}
+                  size={3}
+                  bg="red.500"
+                  borderColor="red.300"
+                  borderWidth={2}
+                />
+              )}
+            </Box>
+            <IconButton onClick={handleOpenDetailsPanel} borderRadius="full">
+              <IoMdInformationCircle size={20} />
+            </IconButton>{' '}
+          </>
         )}
-        <Box position="relative">
-          <IconButton onClick={handleOpenUsersPanel} borderRadius="full">
-            <IoMdPeople size={20} />
-          </IconButton>
-          {room.usersWhoRequestedToJoin?.length > 0 && (
-            <Circle
-              position="absolute"
-              right={0}
-              bottom={0}
-              size={3}
-              bg="red.500"
-              borderColor="red.300"
-              borderWidth={2}
-            />
-          )}
-        </Box>
-        <IconButton onClick={handleOpenDetailsPanel} borderRadius="full">
-          <IoMdInformationCircle size={20} />
-        </IconButton>
         <Menu>
           <IconButton as={MenuButton} borderRadius="full" p={2.5}>
             <BsThreeDots size={20} />
           </IconButton>
           <MenuList>
+            {!showAllButtons && (
+              <>
+                {inCall && (
+                  <MenuItem
+                    onClick={handleOpenMessagesPanel}
+                    icon={<HiChatAlt2 size={20} />}
+                  >
+                    Messages
+                  </MenuItem>
+                )}
+                <MenuItem
+                  onClick={handleOpenUsersPanel}
+                  icon={<IoMdPeople size={20} />}
+                >
+                  Users
+                </MenuItem>
+                <MenuItem
+                  onClick={handleOpenDetailsPanel}
+                  icon={<IoMdInformationCircle size={20} />}
+                >
+                  Details
+                </MenuItem>
+              </>
+            )}
             {own && (
               <>
                 <MenuItem

@@ -9,6 +9,7 @@ export const updateRoom = async (req, res) => {
   const deleteImage = req.body.image === 'null';
   const room = { ...req.body, image: deleteImage ? null : req.file?.id };
   const roomId = req.params.roomId;
+  const user = req.user;
 
   try {
     if (deleteImage || req.file) {
@@ -19,12 +20,12 @@ export const updateRoom = async (req, res) => {
       }
     }
 
-    const newRoom = await Room.findByIdAndUpdate(roomId, room, {
+    const updatedRoom = await Room.findByIdAndUpdate(roomId, room, {
       new: true,
       select: 'name description image privacy',
     });
 
-    await signalRoomUpdated(roomId, newRoom);
+    await signalRoomUpdated(roomId, updatedRoom, user);
 
     return res.end();
   } catch (err) {

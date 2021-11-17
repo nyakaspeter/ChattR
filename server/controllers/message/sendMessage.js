@@ -5,26 +5,27 @@ import { signalMessage } from '../../signals/message.js';
 export const sendMessage = async (req, res) => {
   const roomId = req.params.roomId;
   const sender = req.user;
-  const message = req.body;
-  const files = req.files;
+  const messageBody = req.body;
+  const messageFiles = req.files;
 
   try {
-    const newMessage = {
+    const message = {
       _id: new mongoose.Types.ObjectId(),
+      type: 'text',
       sender: sender._id,
       date: new Date(),
-      text: message.text,
-      files: files,
+      text: messageBody.text,
+      files: messageFiles.length > 0 ? messageFiles : undefined,
     };
 
     await Room.findByIdAndUpdate(roomId, {
-      lastActivity: newMessage.date,
-      $push: { messages: newMessage },
+      lastActivity: message.date,
+      $push: { messages: message },
     });
 
-    await signalMessage(roomId, sender, newMessage);
+    await signalMessage(roomId, sender, message);
 
-    return res.json(newMessage);
+    return res.json(message);
   } catch (err) {
     console.error(err);
     return res.status(500).send(err.message);

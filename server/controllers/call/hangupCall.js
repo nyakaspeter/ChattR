@@ -1,5 +1,5 @@
 import { fetchRoomSession } from '../../config/openvidu.js';
-import { signalSessionUpdated } from '../../signals/sessionUpdated.js';
+import { signalCallEnded } from '../../signals/callEnded.js';
 
 export const hangupCall = async (req, res) => {
   const roomId = req.params.roomId;
@@ -8,7 +8,7 @@ export const hangupCall = async (req, res) => {
     const session = await fetchRoomSession(roomId);
 
     if (!session) {
-      await signalSessionUpdated(roomId, { active: false });
+      await signalCallEnded(roomId);
     }
 
     return res.status(200).end();

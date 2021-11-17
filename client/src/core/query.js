@@ -10,12 +10,6 @@ import {
 import { wsConnect } from './socketio';
 
 export const queryClient = new QueryClient();
-queryClient.updateQueryData = (queryKey, updater) => {
-  const dataExists = !!queryClient.getQueryData(queryKey);
-  if (dataExists) {
-    queryClient.setQueryData(queryKey, updater);
-  }
-};
 
 export const userKeys = {
   all: () => ['user'],
@@ -38,6 +32,39 @@ export const roomKeys = {
   session: id => [...roomKeys.sessions(), id],
   tokens: () => [...roomKeys.all(), 'token'],
   token: id => [...roomKeys.tokens(), id],
+};
+
+queryClient.updateQueryData = (queryKey, updater) => {
+  const dataExists = !!queryClient.getQueryData(queryKey);
+  if (dataExists) {
+    queryClient.setQueryData(queryKey, updater);
+  }
+};
+
+queryClient.updateLastMessage = (roomId, message, sender) => {
+  queryClient.updateQueryData(roomKeys.list(), old => {
+    const rooms = old.rooms;
+    const pending = old.pending;
+
+    const lastMessage = { ...message };
+    lastMessage.sender = sender;
+
+    const room = rooms.find(r => r._id === roomId);
+    room.lastMessage = lastMessage;
+    room.lastActivity = message.date;
+
+    return { rooms, pending };
+  });
+};
+
+queryClient.updateMessages = (roomId, message) => {
+  queryClient.setQueryData(roomKeys.messageList(roomId), old => {
+    if (old) {
+      const msg = old.find(m => m._id === message._id);
+      return msg ? old : [...old, message];
+    }
+    return [message];
+  });
 };
 
 export const useUser = options => {

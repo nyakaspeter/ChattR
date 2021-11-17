@@ -1,7 +1,7 @@
 import { fetchRoomSession, ovClient } from '../config/openvidu.js';
 import socketio from '../config/socketio.js';
 import Room from '../models/room.js';
-import { signalSessionUpdated } from './sessionUpdated.js';
+import { signalCallEnded } from './callEnded.js';
 
 export const signalUserOffline = async userId => {
   const rooms = await Room.find({ users: userId }, '_id').lean();
@@ -25,7 +25,7 @@ export const signalUserOffline = async userId => {
     if (session) {
       const updatedSession = await fetchRoomSession(room._id);
       if (!updatedSession) {
-        await signalSessionUpdated(room._id, { active: false });
+        await signalCallEnded(room._id);
       }
     }
   });

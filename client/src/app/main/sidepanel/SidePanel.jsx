@@ -2,6 +2,7 @@ import { IconButton } from '@chakra-ui/button';
 import { CloseIcon } from '@chakra-ui/icons';
 import { Box, Heading, HStack, VStack } from '@chakra-ui/layout';
 import React from 'react';
+import { ScrollView } from '../../../components/ScrollView';
 import { useUiState } from '../../../core/store';
 
 const SidePanel = props => {
@@ -19,7 +20,7 @@ const SidePanel = props => {
           <CloseIcon />
         </IconButton>
       </HStack>
-      {Content && <Content room={room} flex="1" />}
+      <ScrollView>{Content && <Content room={room} h="100%" />}</ScrollView>
     </VStack>
   );
 };

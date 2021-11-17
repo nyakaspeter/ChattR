@@ -3,7 +3,8 @@ import { queryClient, roomKeys } from '../query.js';
 export const handleUserLeft = e => {
   queryClient.updateQueryData(roomKeys.info(e.roomId), old => ({
     ...old,
-    users: old.users.filter(u => u._id !== e.userId),
+    users: old.users.filter(u => u._id !== e.sender._id),
+    usersWhoLeft: [...old.usersWhoLeft, e.sender],
   }));
 
   queryClient.updateQueryData(roomKeys.list(), old => {
@@ -17,4 +18,7 @@ export const handleUserLeft = e => {
       rooms,
     };
   });
+
+  queryClient.updateMessages(e.roomId, e.message);
+  queryClient.updateLastMessage(e.roomId, e.message, e.sender);
 };

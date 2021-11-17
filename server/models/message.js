@@ -1,6 +1,21 @@
 import mongoose from 'mongoose';
 
 const messageSchema = mongoose.Schema({
+  type: {
+    type: String,
+    enum: [
+      'text',
+      'callStarted',
+      'callEnded',
+      'recordingStarted',
+      'recordingEnded',
+      'roomCreated',
+      'roomUpdated',
+      'userJoined',
+      'userLeft',
+    ],
+    default: 'text',
+  },
   sender: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User',
@@ -12,14 +27,22 @@ const messageSchema = mongoose.Schema({
   },
   text: {
     type: String,
-    required: false,
     maxLength: 1000,
   },
-  files: [
-    {
-      type: Object,
-    },
-  ],
+  files: {
+    type: [
+      {
+        type: Object,
+      },
+    ],
+    default: undefined,
+  },
+  length: {
+    type: Number,
+  },
+  recording: {
+    type: String,
+  },
 });
 
 const Message = { schema: messageSchema };

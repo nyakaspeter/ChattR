@@ -1,16 +1,22 @@
 import { OpenViduRole } from 'openvidu-node-client';
 import { createRoomSession, fetchRoomSession } from '../../config/openvidu.js';
+import { signalCallStarted } from '../../signals/callStarted.js';
 
 export const getRoomToken = async (req, res) => {
   const roomId = req.params.roomId;
-  const userId = req.user._id;
+  const caller = req.user;
 
   try {
-    const session =
-      (await fetchRoomSession(roomId)) || (await createRoomSession(roomId));
+    let session = await fetchRoomSession(roomId);
+
+    if (!session) {
+      session = await createRoomSession(roomId);
+
+      await signalCallStarted(roomId, caller, new Date(session.createdAt));
+    }
 
     const connection = await session.createConnection({
-      data: userId,
+      data: caller._id,
       role: OpenViduRole.PUBLISHER,
     });
 

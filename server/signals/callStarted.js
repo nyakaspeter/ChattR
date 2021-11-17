@@ -2,12 +2,12 @@ import mongoose from '../config/mongoose.js';
 import socketio from '../config/socketio.js';
 import Room from '../models/room.js';
 
-export const signalRoomUpdated = async (roomId, room, user) => {
+export const signalCallStarted = async (roomId, caller, date) => {
   const message = {
     _id: new mongoose.Types.ObjectId(),
-    type: 'roomUpdated',
-    sender: new mongoose.Types.ObjectId(user._id),
-    date: new Date(),
+    type: 'callStarted',
+    sender: new mongoose.Types.ObjectId(caller._id),
+    date: new Date(date),
   };
 
   await Room.findByIdAndUpdate(roomId, {
@@ -15,5 +15,5 @@ export const signalRoomUpdated = async (roomId, room, user) => {
     $push: { messages: message },
   });
 
-  socketio.emitToRoom(roomId, 'roomUpdated', { room, message, sender: user });
+  socketio.emitToRoom(roomId, 'callStarted', { message, sender: caller });
 };

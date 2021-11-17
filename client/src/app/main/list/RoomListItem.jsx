@@ -13,6 +13,30 @@ const RoomListItem = props => {
 
   const callSession = useOpenViduSession(room._id);
 
+  const messageSender = () => room.lastMessage.sender.name.split(' ')[0];
+
+  const messageText = () => {
+    switch (room.lastMessage.type) {
+      case 'text':
+        if (room.lastMessage.text) return room.lastMessage.text;
+        else return `Sent ${room.lastMessage.files?.length} files`;
+      case 'callStarted':
+        return 'Started call';
+      case 'callEnded':
+        return 'Call ended';
+      case 'roomUpdated':
+        return 'Updated room';
+      case 'userJoined':
+        return 'Joined room';
+      case 'userLeft':
+        return 'Left room';
+      case 'recordingStarted':
+        return 'Started recording';
+      case 'recordingEnded':
+        return 'Ended recording';
+    }
+  };
+
   return (
     <Flex
       as={Link}
@@ -41,12 +65,9 @@ const RoomListItem = props => {
           <Text fontWeight="bold" noOfLines="1" wordBreak="break-all">
             {room.name}
           </Text>
-          {room.lastMessage && (
+          {room.lastMessage && room.lastMessage.type !== 'roomCreated' && (
             <Text fontSize="sm" noOfLines="1" wordBreak="break-all">
-              {`${room.lastMessage.sender.name.split(' ')[0]}: ${
-                room.lastMessage.text ||
-                `Sent ${room.lastMessage.files.length} files`
-              }`}
+              {`${messageSender()}: ${messageText()}`}
             </Text>
           )}
         </VStack>

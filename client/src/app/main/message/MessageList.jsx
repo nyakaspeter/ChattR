@@ -5,6 +5,7 @@ import { Fade } from '@chakra-ui/transition';
 import React, { useEffect, useRef, useState } from 'react';
 import { ScrollView } from '../../../components/ScrollView';
 import { useMessages, useUser } from '../../../core/query';
+import MessageListAnnouncement from './MessageListAnnouncement';
 import MessageListItem from './MessageListItem';
 
 const MessageList = props => {
@@ -69,18 +70,37 @@ const MessageList = props => {
               const lastMessageBySender =
                 messages.data[i + 1]?.sender !== message.sender;
 
-              return (
-                <MessageListItem
-                  key={message._id}
-                  roomId={room._id}
-                  message={message}
-                  own={own}
-                  alignSelf={own ? 'flex-end' : 'flex-start'}
-                  maxW="80%"
-                  showAvatar={lastMessageBySender}
-                  sender={roomUsers?.find(u => u._id === message.sender)}
-                />
-              );
+              switch (message.type) {
+                case 'text':
+                case 'callStarted':
+                case 'callEnded':
+                case 'recordingStarted':
+                case 'recordingEnded':
+                  return (
+                    <MessageListItem
+                      key={message._id}
+                      roomId={room._id}
+                      message={message}
+                      own={own}
+                      alignSelf={own ? 'flex-end' : 'flex-start'}
+                      maxW="80%"
+                      showAvatar={lastMessageBySender}
+                      sender={roomUsers?.find(u => u._id === message.sender)}
+                    />
+                  );
+                case 'roomCreated':
+                case 'roomUpdated':
+                case 'userJoined':
+                case 'userLeft':
+                  return (
+                    <MessageListAnnouncement
+                      key={message._id}
+                      message={message}
+                      sender={roomUsers?.find(u => u._id === message.sender)}
+                      alignSelf="center"
+                    />
+                  );
+              }
             })}
           </VStack>
         </Fade>

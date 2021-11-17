@@ -1,15 +1,16 @@
 import io from 'socket.io-client';
 import { queryClient, socketKeys } from './query';
+import { handleCallEnded } from './signals/callEnded';
+import { handleCallStarted } from './signals/callStarted';
 import { handleJoinRequest } from './signals/joinRequest';
 import { handleJoinRequestAccepted } from './signals/joinRequestAccepted';
 import { handleJoinRequestCancelled } from './signals/joinRequestCancelled';
 import { handleJoinRequestDeclined } from './signals/joinRequestDeclined';
 import { handleMessage } from './signals/message';
+import { handleRecordingEnded } from './signals/recordingEnded';
 import { handleRecordingStarted } from './signals/recordingStarted';
-import { handleRecordingStopped } from './signals/recordingStopped';
 import { handleRoomDeleted } from './signals/roomDeleted';
 import { handleRoomUpdated } from './signals/roomUpdated';
-import { handleSessionUpdated } from './signals/sessionUpdated';
 import { handleUserJoined } from './signals/userJoined';
 import { handleUserLeft } from './signals/userLeft';
 import { handleUserOffline } from './signals/userOffline';
@@ -49,16 +50,17 @@ export async function wsConnect() {
     queryClient.invalidateQueries(socketKeys.current());
   });
 
+  socket.on('callEnded', handleCallEnded);
+  socket.on('callStarted', handleCallStarted);
   socket.on('joinRequest', handleJoinRequest);
   socket.on('joinRequestAccepted', handleJoinRequestAccepted);
   socket.on('joinRequestCancelled', handleJoinRequestCancelled);
   socket.on('joinRequestDeclined', handleJoinRequestDeclined);
   socket.on('message', handleMessage);
+  socket.on('recordingEnded', handleRecordingEnded);
   socket.on('recordingStarted', handleRecordingStarted);
-  socket.on('recordingStopped', handleRecordingStopped);
   socket.on('roomDeleted', handleRoomDeleted);
   socket.on('roomUpdated', handleRoomUpdated);
-  socket.on('sessionUpdated', handleSessionUpdated);
   socket.on('userJoined', handleUserJoined);
   socket.on('userLeft', handleUserLeft);
   socket.on('userOffline', handleUserOffline);

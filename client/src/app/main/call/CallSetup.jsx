@@ -194,7 +194,7 @@ const CallSetup = props => {
   }, []);
 
   return (
-    <VStack {...rest} px={3} pb={6} spacing={4} alignItems="stretch">
+    <VStack {...rest} px={3} spacing={4} alignItems="stretch">
       <Box
         bg="black"
         w="100%"
@@ -310,7 +310,7 @@ const CallSetup = props => {
           colorScheme="green"
         />
       </VStack>
-      <Button onClick={toggleTestMic} borderRadius="full">
+      <Button onClick={toggleTestMic} borderRadius="full" flex="none">
         <HStack>
           {testMic ? (
             <RiCheckboxCircleFill size={20} />
@@ -321,7 +321,7 @@ const CallSetup = props => {
           <Text>Test microphone</Text>
         </HStack>
       </Button>
-      <Button onClick={handleReloadDevices} borderRadius="full">
+      <Button onClick={handleReloadDevices} borderRadius="full" flex="none">
         <HStack>
           <MdRefresh size={20} />
           <Text>Reload devices</Text>
@@ -329,19 +329,23 @@ const CallSetup = props => {
       </Button>
       <Box flex="1" />
       {!callToken.data?.token && (
-        <Button
-          onClick={handleStartCall}
-          isLoading={callMutation.isLoading}
-          alignSelf="center"
-          size="lg"
-          borderRadius="full"
-          colorScheme="green"
-        >
-          <HStack>
-            <MdCall size={20} />
-            <Text>{callSession.data?.active ? 'Join call' : 'Start call'}</Text>
-          </HStack>
-        </Button>
+        <Box alignSelf="center" pb={6}>
+          <Button
+            onClick={handleStartCall}
+            isLoading={callMutation.isLoading}
+            size="lg"
+            borderRadius="full"
+            colorScheme="green"
+            flex="none"
+          >
+            <HStack>
+              <MdCall size={20} />
+              <Text>
+                {callSession.data?.active ? 'Join call' : 'Start call'}
+              </Text>
+            </HStack>
+          </Button>
+        </Box>
       )}
     </VStack>
   );
