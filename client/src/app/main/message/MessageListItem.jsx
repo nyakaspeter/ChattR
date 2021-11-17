@@ -54,7 +54,7 @@ const MessageListItem = props => {
         )}
 
         {message.type === 'callStarted' && (
-          <HStack p={2} borderRadius="lg" w="100%" spacing={4}>
+          <HStack p={2} bg={fileBg} borderRadius="lg" w="100%" spacing={4}>
             <Circle bg="green.500" h={10} w={10}>
               <MdCall size={20} color="white" />
             </Circle>
@@ -73,7 +73,7 @@ const MessageListItem = props => {
         )}
 
         {message.type === 'callEnded' && (
-          <HStack p={2} borderRadius="lg" w="100%" spacing={4}>
+          <HStack p={2} bg={fileBg} borderRadius="lg" w="100%" spacing={4}>
             <Circle bg="red.600" h={10} w={10}>
               <MdCallEnd size={20} color="white" />
             </Circle>

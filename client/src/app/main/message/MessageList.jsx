@@ -1,12 +1,19 @@
 import { IconButton } from '@chakra-ui/button';
 import { ArrowDownIcon } from '@chakra-ui/icons';
-import { VStack } from '@chakra-ui/layout';
+import { Divider, Text, VStack } from '@chakra-ui/layout';
 import { Fade } from '@chakra-ui/transition';
 import React, { useEffect, useRef, useState } from 'react';
 import { ScrollView } from '../../../components/ScrollView';
 import { useMessages, useUser } from '../../../core/query';
 import MessageListAnnouncement from './MessageListAnnouncement';
 import MessageListItem from './MessageListItem';
+
+const oneSec = 1000;
+const oneMinute = 60 * oneSec;
+const oneHour = 60 * oneMinute;
+const oneDay = 24 * oneHour;
+const oneWeek = 7 * oneDay;
+const oneYear = 365 * oneDay; // Doesn't matter it's not accurate
 
 const MessageList = props => {
   const { room, ...rest } = props;
@@ -67,8 +74,17 @@ const MessageList = props => {
           <VStack p={2}>
             {messages.data.map((message, i) => {
               const own = message.sender === user.data._id;
+              const nextMessage = messages.data[i + 1];
+              const prevMessage = messages.data[i - 1];
               const lastMessageBySender =
-                messages.data[i + 1]?.sender !== message.sender;
+                nextMessage?.sender !== message.sender ||
+                nextMessage?.type !== message.type;
+              const prevMessageDate = prevMessage?.date;
+              const timeSincePrevMessage =
+                new Date(message.date) - new Date(prevMessageDate) || Infinity;
+              const messageAge = new Date() - new Date(message.date);
+
+              let item;
 
               switch (message.type) {
                 case 'text':
@@ -76,9 +92,8 @@ const MessageList = props => {
                 case 'callEnded':
                 case 'recordingStarted':
                 case 'recordingEnded':
-                  return (
+                  item = (
                     <MessageListItem
-                      key={message._id}
                       roomId={room._id}
                       message={message}
                       own={own}
@@ -88,19 +103,41 @@ const MessageList = props => {
                       sender={roomUsers?.find(u => u._id === message.sender)}
                     />
                   );
+                  break;
                 case 'roomCreated':
                 case 'roomUpdated':
                 case 'userJoined':
                 case 'userLeft':
-                  return (
+                  item = (
                     <MessageListAnnouncement
-                      key={message._id}
                       message={message}
                       sender={roomUsers?.find(u => u._id === message.sender)}
                       alignSelf="center"
                     />
                   );
+                  break;
               }
+
+              return (
+                <VStack key={message._id} alignSelf="stretch">
+                  {timeSincePrevMessage > 3600000 && (
+                    <>
+                      <Text fontSize="sm" opacity={0.8}>
+                        {new Date(message.date).toLocaleString(undefined, {
+                          year: messageAge > oneYear ? 'numeric' : undefined,
+                          month: messageAge > oneWeek ? 'long' : undefined,
+                          day: messageAge > oneWeek ? 'numeric' : undefined,
+                          weekday: messageAge > oneDay ? 'long' : undefined,
+                          hour: '2-digit',
+                          minute: '2-digit',
+                        })}
+                      </Text>
+                      <Divider opacity={0.2} />
+                    </>
+                  )}
+                  {item}
+                </VStack>
+              );
             })}
           </VStack>
         </Fade>

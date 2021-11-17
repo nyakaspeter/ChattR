@@ -20,7 +20,7 @@ import {
 } from '@chakra-ui/modal';
 import { Textarea } from '@chakra-ui/textarea';
 import { useFormik } from 'formik';
-import React, { useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { FaUsers } from 'react-icons/fa';
 import { MdDelete, MdLock, MdPhotoCamera, MdPublic } from 'react-icons/md';
 import { useMutation, useQueryClient } from 'react-query';
@@ -51,11 +51,7 @@ const CreateOrEditRoomModal = props => {
   const { isOpen, onClose, room } = props;
 
   const editing = !!room;
-  const hasImage = editing && room.image;
-
-  const initialImageUrl = hasImage
-    ? `/api/room/${room._id}/image?id=${room.image}`
-    : undefined;
+  const hasImage = editing && !!room.image;
 
   const avatarBgColor = useColorModeValue('gray.300', 'gray.600');
   const avatarOptionsBgColor = useColorModeValue(
@@ -92,16 +88,16 @@ const CreateOrEditRoomModal = props => {
           }));
         }
 
-        handleClose();
+        onClose();
       },
     }
   );
 
   const [showAvatarOptions, setShowAvatarOptions] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+  const [imageUrl, setImageUrl] = useState();
 
   const imageInput = useRef();
-  const imageUrl = useRef(initialImageUrl);
 
   const formik = useFormik({
     enableReinitialize: true,
@@ -148,26 +144,27 @@ const CreateOrEditRoomModal = props => {
     formik.setFieldValue('image', event.target.files[0]);
 
     if (imageUrl) {
-      URL.revokeObjectURL(imageUrl.current);
+      URL.revokeObjectURL(imageUrl);
     }
-    imageUrl.current = URL.createObjectURL(event.target.files[0]);
+    setImageUrl(URL.createObjectURL(event.target.files[0]));
 
     imageInput.current.value = null;
   };
 
   const handleUnselectImage = () => {
     formik.setFieldValue('image', null);
-    imageUrl.current = undefined;
+    setImageUrl(undefined);
   };
 
-  const handleClose = () => {
+  useEffect(() => {
     formik.resetForm();
-    imageUrl.current = initialImageUrl;
-    onClose();
-  };
+    setImageUrl(
+      room?.image ? `/api/room/${room._id}/image?id=${room.image}` : undefined
+    );
+  }, [isOpen]);
 
   return (
-    <Modal isOpen={isOpen} onClose={handleClose}>
+    <Modal isOpen={isOpen} onClose={onClose}>
       <ModalOverlay />
       <ModalContent>
         <ModalHeader>{`${editing ? 'Edit' : 'Create'} chat room`}</ModalHeader>
@@ -185,7 +182,7 @@ const CreateOrEditRoomModal = props => {
                 name={formik.values.name}
                 bg={avatarBgColor}
                 color="white"
-                src={imageUrl.current}
+                src={imageUrl}
               />
               <input
                 ref={imageInput}
@@ -314,7 +311,7 @@ const CreateOrEditRoomModal = props => {
           >
             {editing ? 'Save' : 'Create'}
           </Button>
-          <Button onClick={handleClose}>Cancel</Button>
+          <Button onClick={onClose}>Cancel</Button>
         </ModalFooter>
       </ModalContent>
     </Modal>

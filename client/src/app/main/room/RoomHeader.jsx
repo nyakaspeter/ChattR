@@ -1,6 +1,6 @@
 import { Avatar } from '@chakra-ui/avatar';
 import { IconButton } from '@chakra-ui/button';
-import { useDisclosure } from '@chakra-ui/hooks';
+import { useClipboard, useDisclosure } from '@chakra-ui/hooks';
 import { Badge, Box, Circle, Heading, HStack, VStack } from '@chakra-ui/layout';
 import { useBreakpointValue } from '@chakra-ui/media-query';
 import {
@@ -10,13 +10,14 @@ import {
   MenuItem,
   MenuList,
 } from '@chakra-ui/menu';
+import { useToast } from '@chakra-ui/toast';
 import { Fade } from '@chakra-ui/transition';
 import React from 'react';
 import { BsThreeDots } from 'react-icons/bs';
 import { HiChatAlt2 } from 'react-icons/hi';
 import { ImExit } from 'react-icons/im';
 import { IoMdInformationCircle, IoMdPeople } from 'react-icons/io';
-import { MdCall, MdDelete, MdEdit } from 'react-icons/md';
+import { MdCall, MdDelete, MdEdit, MdPersonAdd } from 'react-icons/md';
 import ElapsedTimeText from '../../../components/ElapsedTime';
 import { useUser } from '../../../core/query';
 import { useUiState } from '../../../core/store';
@@ -35,6 +36,8 @@ const RoomHeader = props => {
   const own = user.data._id === room.owner;
 
   const uiState = useUiState();
+  const toast = useToast();
+  const { onCopy: copyCurrentUrl } = useClipboard(window.location.href);
 
   const showUserCounts = useBreakpointValue({ base: false, sm: true });
   const showAllButtons = useBreakpointValue({ base: false, md: true });
@@ -68,6 +71,16 @@ const RoomHeader = props => {
 
   const handleOpenDetailsPanel = () =>
     uiState.currentPanel.set({ title: 'Details', content: RoomDetails });
+
+  const handleInvitePeople = () => {
+    copyCurrentUrl();
+    toast({
+      title: 'Room link copied!',
+      description: "The room's link has been copied to the clipboard",
+      status: 'success',
+      isClosable: true,
+    });
+  };
 
   return (
     <Fade in>
@@ -164,7 +177,20 @@ const RoomHeader = props => {
                 </MenuItem>
               </>
             )}
-            {own && (
+            {(room.privacy === 'public' ||
+              room.privacy === 'protected' ||
+              own) && (
+              <>
+                <MenuItem
+                  onClick={handleInvitePeople}
+                  icon={<MdPersonAdd size={20} />}
+                >
+                  Invite people
+                </MenuItem>
+                <MenuDivider />
+              </>
+            )}
+            {own ? (
               <>
                 <MenuItem
                   onClick={openEditRoomModal}
@@ -172,18 +198,15 @@ const RoomHeader = props => {
                 >
                   Edit room
                 </MenuItem>
-                <MenuDivider />
-              </>
-            )}
 
-            {own ? (
-              <MenuItem
-                onClick={openDeleteRoomModal}
-                icon={<MdDelete size={20} />}
-                color="red.500"
-              >
-                Delete room
-              </MenuItem>
+                <MenuItem
+                  onClick={openDeleteRoomModal}
+                  icon={<MdDelete size={20} />}
+                  color="red.500"
+                >
+                  Delete room
+                </MenuItem>
+              </>
             ) : (
               <MenuItem
                 onClick={openLeaveRoomModal}
