@@ -13,11 +13,16 @@ import {
 import { Switch } from '@chakra-ui/switch';
 import React from 'react';
 import { IoMdMoon } from 'react-icons/io';
+import { MdBrandingWatermark } from 'react-icons/md';
+import { useCallSettings } from '../../../core/store';
 
 const SettingsModal = props => {
   const { isOpen, onClose } = props;
 
+  const callSettings = useCallSettings();
   const { colorMode, toggleColorMode } = useColorMode();
+
+  const toggleNameOverlay = () => callSettings.nameOverlay.set(e => !e);
 
   return (
     <Modal isOpen={isOpen} onClose={onClose}>
@@ -26,13 +31,29 @@ const SettingsModal = props => {
         <ModalHeader>Settings</ModalHeader>
         <ModalCloseButton />
         <ModalBody>
-          <VStack alignItems="stretch">
+          <VStack alignItems="stretch" spacing={6}>
             <HStack spacing={4}>
               <IoMdMoon size={20} />
-              <Text flex="1">Dark mode</Text>
+              <VStack flex="1" alignItems="start" spacing={0}>
+                <Text>Enable dark mode</Text>
+                <Text fontSize="xs">Choose between light and dark theme</Text>
+              </VStack>
               <Switch
                 isChecked={colorMode === 'dark'}
                 onChange={toggleColorMode}
+              />
+            </HStack>
+            <HStack spacing={4}>
+              <MdBrandingWatermark size={20} />
+              <VStack flex="1" alignItems="start" spacing={0}>
+                <Text>Overlay name on video stream</Text>
+                <Text fontSize="xs">
+                  This will only be visible for remote viewers
+                </Text>
+              </VStack>
+              <Switch
+                isChecked={callSettings.nameOverlay.value}
+                onChange={toggleNameOverlay}
               />
             </HStack>
           </VStack>

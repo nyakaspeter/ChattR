@@ -14,6 +14,7 @@ const callSettings = createState({
   camEnabled: true,
   micEnabled: true,
   soundEnabled: true,
+  nameOverlay: false,
 });
 callSettings.attach(Persistence('callSettings'));
 

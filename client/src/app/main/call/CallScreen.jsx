@@ -72,6 +72,14 @@ const CallScreen = props => {
       videoSource: callSettings.selectedCam.value || false,
       audioSource: callSettings.selectedMic.value || false,
       mirror: false,
+      filter: callSettings.nameOverlay.value
+        ? {
+            type: 'GStreamerFilter',
+            options: {
+              command: `textoverlay text="${user.data.name}" valignment=top halignment=right font-desc="Cantarell 16"`,
+            },
+          }
+        : undefined,
     });
     setLocal(publisher.current);
   };

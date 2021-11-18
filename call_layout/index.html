@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Videoconference Dish CSS3 & Vanilla JavaScript</title>
+
+    <!-- General (optional) -->
+    <link rel="stylesheet" href="general/styles.css">
+
+    <!-- Core -->
+    <link rel="stylesheet" href="core/styles.css">
+    <script src="core/script.js"></script>
+    <script src="openvidu-browser-2.20.0.min.js"></script>
+</head>
+
+<body>
+    <div id="Dish"></div>
+</body>
+
+<script>
+    var url = new URL(window.location.href);
+    var SESSION_ID = url.searchParams.get("sessionId");
+    var SECRET = url.searchParams.get("secret");
+    var TOKEN = 'wss://' + location.host + '?sessionId=' + SESSION_ID + '&secret=' + SECRET + '&recorder=true';
+
+    var OV = new OpenVidu();
+    var session = OV.initSession();
+
+    session.on("streamCreated", (event) => {
+        var dish = document.getElementById("Dish");
+        var camera = document.createElement("div");
+        camera.setAttribute("id", event.stream.streamId);
+        camera.setAttribute("class", "Camera");
+        dish.appendChild(camera);
+        Dish();
+
+        session.subscribe(event.stream, camera);
+    });
+
+    session.on("streamDestroyed", (event) => {
+        var dish = document.getElementById("Dish");
+        var camera = document.getElementById(event.stream.streamId);
+        dish.removeChild(camera);
+        Dish();
+    });
+
+    session.connect(TOKEN)
+        .then(() => { console.log('Recorder participant connected') })
+        .catch(error => { console.error(error) });
+</script>
+
+</html>

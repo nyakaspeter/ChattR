@@ -1,0 +1,12 @@
+/* Scenary */
+body,
+html {
+  background: #1a202c;
+  margin: 0;
+  padding: 0;
+}
+/* All */
+* {
+  font-size: 0;
+  box-sizing: border-box;
+}

@@ -19,6 +19,9 @@ export const getRoomToken = async (req, res) => {
     const connection = await session.createConnection({
       data: caller._id,
       role: OpenViduRole.PUBLISHER,
+      kurentoOptions: {
+        allowedFilters: ['GStreamerFilter'],
+      },
     });
 
     return res.json({
