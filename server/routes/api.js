@@ -6,6 +6,7 @@ import { hangupCall } from '../controllers/call/hangupCall.js';
 import { startRecording } from '../controllers/call/startRecording.js';
 import { stopRecording } from '../controllers/call/stopRecording.js';
 import { getMessageFile } from '../controllers/message/getMessageFile.js';
+import { getMessageRecording } from '../controllers/message/getMessageRecording.js';
 import { getMessages } from '../controllers/message/getMessages.js';
 import { sendMessage } from '../controllers/message/sendMessage.js';
 import { createRoom } from '../controllers/room/createRoom.js';
@@ -74,6 +75,12 @@ router.get(
   getMessageFile
 );
 
+router.get(
+  '/room/:roomId/message/:messageId/recording/:recordingId/download',
+  authorize('roomUser'),
+  getMessageRecording
+);
+
 router.get('/room/:roomId/session', authorize('roomUser'), getRoomSession);
 router.get('/room/:roomId/token', authorize('roomUser'), getRoomToken);
 router.get('/room/:roomId/hangup', authorize('roomUser'), hangupCall);
@@ -84,7 +91,7 @@ router.get(
   startRecording
 );
 
-router.post(
+router.get(
   '/room/:roomId/recording/stop',
   authorize('roomOwner'),
   stopRecording

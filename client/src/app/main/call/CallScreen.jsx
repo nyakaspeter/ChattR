@@ -17,9 +17,10 @@ import {
 } from 'react-icons/md';
 import { useMutation, useQueryClient } from 'react-query';
 import { Prompt } from 'react-router';
-import { hangupCall } from '../../../core/api';
+import ElapsedTimeText from '../../../components/ElapsedTime';
+import { hangupCall, startRecording, stopRecording } from '../../../core/api';
 import { openvidu } from '../../../core/openvidu';
-import { roomKeys, useUser } from '../../../core/query';
+import { roomKeys, useOpenViduSession, useUser } from '../../../core/query';
 import { useCallSettings } from '../../../core/store';
 import VideoGrid from './VideoGrid';
 
@@ -37,6 +38,7 @@ const CallScreen = props => {
 
   const queryClient = useQueryClient();
   const callSettings = useCallSettings();
+  const callSession = useOpenViduSession(room._id);
   const initializing = useRef();
   const publisher = useRef();
   const session = useRef();
@@ -150,6 +152,14 @@ const CallScreen = props => {
   };
   useBeforeunload(handleHangup);
 
+  const startRecordingMutation = useMutation(roomId => startRecording(roomId));
+  const stopRecordingMutation = useMutation(roomId => stopRecording(roomId));
+
+  const handleRecording = () =>
+    callSession.data?.recording
+      ? stopRecordingMutation.mutate(room._id)
+      : startRecordingMutation.mutate(room._id);
+
   useEffect(async () => {
     await connectToSession();
     await publishStream();
@@ -240,8 +250,28 @@ const CallScreen = props => {
                 )}
               </IconButton>
               {own && (
-                <IconButton size="lg" borderRadius="full" color="red.500">
-                  <BsRecordFill size={24} />
+                <IconButton
+                  onClick={handleRecording}
+                  isLoading={
+                    startRecordingMutation.isLoading ||
+                    stopRecordingMutation.isLoading
+                  }
+                  p={3}
+                  size="lg"
+                  borderRadius="full"
+                  colorScheme={callSession.data?.recording ? 'red' : undefined}
+                  color={callSession.data?.recording ? undefined : 'red.500'}
+                >
+                  <HStack>
+                    <BsRecordFill size={24} />
+                    {callSession.data?.recording && (
+                      <Box pr={2}>
+                        <ElapsedTimeText
+                          since={callSession.data?.recordingStartedAt}
+                        />
+                      </Box>
+                    )}
+                  </HStack>
                 </IconButton>
               )}
             </HStack>

@@ -4,6 +4,7 @@ import { useColorModeValue } from '@chakra-ui/color-mode';
 import { DownloadIcon } from '@chakra-ui/icons';
 import { Circle, HStack, SimpleGrid, Text, VStack } from '@chakra-ui/layout';
 import React from 'react';
+import { BsRecordFill } from 'react-icons/bs';
 import { FaRegFile } from 'react-icons/fa';
 import { MdCall, MdCallEnd } from 'react-icons/md';
 import { useMutation } from 'react-query';
@@ -55,16 +56,24 @@ const MessageListItem = props => {
 
         {message.type === 'callStarted' && (
           <HStack p={2} bg={fileBg} borderRadius="lg" w="100%" spacing={4}>
-            <Circle bg="green.500" h={10} w={10}>
+            <Circle bg="green.500" h={8} w={8}>
               <MdCall size={20} color="white" />
             </Circle>
-            <Text fontWeight="bold" flex="1">
+            <Text
+              fontWeight="semibold"
+              fontSize="sm"
+              noOfLines="1"
+              wordBreak="break-all"
+              textOverflow="ellipsis"
+              flex="1"
+            >
               {sender.name} started a call
             </Text>
             {!callToken.data?.token && (
               <Button
                 onClick={handleJoinCall}
                 isLoading={callMutation.isLoading}
+                size="sm"
               >
                 Join
               </Button>
@@ -74,19 +83,71 @@ const MessageListItem = props => {
 
         {message.type === 'callEnded' && (
           <HStack p={2} bg={fileBg} borderRadius="lg" w="100%" spacing={4}>
-            <Circle bg="red.600" h={10} w={10}>
+            <Circle bg="red.600" h={8} w={8}>
               <MdCallEnd size={20} color="white" />
             </Circle>
-            <Text fontWeight="bold" flex="1">
+            <Text
+              fontWeight="semibold"
+              fontSize="sm"
+              noOfLines="1"
+              wordBreak="break-all"
+              textOverflow="ellipsis"
+              flex="1"
+            >
               Call ended
             </Text>
-            <Button>{toHHMMSS(message.length / 1000)}</Button>
+            <Button size="sm">{toHHMMSS(message.length / 1000)}</Button>
           </HStack>
         )}
 
-        {/* <Text whiteSpace="pre-wrap" wordBreak="break-word">
-          {JSON.stringify(message, null, 2)}
-        </Text> */}
+        {message.type === 'recordingStarted' && (
+          <HStack p={2} bg={fileBg} borderRadius="lg" w="100%" spacing={4}>
+            <Circle bg="red.600" h={8} w={8}>
+              <BsRecordFill size={20} color="white" />
+            </Circle>
+            <Text
+              fontWeight="semibold"
+              fontSize="sm"
+              noOfLines="1"
+              wordBreak="break-all"
+              textOverflow="ellipsis"
+              flex="1"
+            >
+              {sender.name} started a recording
+            </Text>
+          </HStack>
+        )}
+
+        {message.type === 'recordingEnded' && (
+          <HStack p={2} bg={fileBg} borderRadius="lg" w="100%" spacing={4}>
+            <Circle bg="red.600" h={8} w={8}>
+              <BsRecordFill size={20} color="white" />
+            </Circle>
+            <Text
+              fontWeight="semibold"
+              fontSize="sm"
+              noOfLines="1"
+              wordBreak="break-all"
+              textOverflow="ellipsis"
+              flex="1"
+            >
+              Recording ended
+            </Text>
+            <HStack>
+              <Button size="sm">{toHHMMSS(message.length / 1000)}</Button>
+              <Button
+                as="a"
+                download
+                href={`/api/room/${roomId}/message/${message._id}/recording/${message.recording}/download`}
+                size="sm"
+                p={0}
+              >
+                <DownloadIcon fontSize="sm" />
+              </Button>
+            </HStack>
+          </HStack>
+        )}
+
         {message.files?.length > 0 && (
           <SimpleGrid
             alignSelf="stretch"
@@ -100,12 +161,14 @@ const MessageListItem = props => {
             {message.files.map(file => (
               <HStack
                 key={file.id}
-                p={2.5}
+                p={2}
                 bg={fileBg}
                 borderRadius="md"
                 flex="1"
               >
-                <FaRegFile size={20} />
+                <Circle bg="blue.500" h={8} w={8}>
+                  <FaRegFile size={20} color="white" />
+                </Circle>
                 <Text
                   fontWeight="semibold"
                   fontSize="sm"
@@ -118,13 +181,12 @@ const MessageListItem = props => {
                 </Text>
                 <Button
                   as="a"
+                  download
                   href={`/api/room/${roomId}/message/${message._id}/files/${file.id}/download`}
-                  size="xs"
-                  borderRadius="full"
-                  colorScheme="blue"
+                  size="sm"
                   p={0}
                 >
-                  <DownloadIcon fontSize="xs" />
+                  <DownloadIcon fontSize="sm" />
                 </Button>
               </HStack>
             ))}

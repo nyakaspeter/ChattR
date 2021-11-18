@@ -1,12 +1,31 @@
+import { fetchRoomSession, ovClient } from '../../config/openvidu.js';
+import { signalRecordingStarted } from '../../signals/recordingStarted.js';
+
 export const startRecording = async (req, res) => {
   const roomId = req.params.roomId;
+  const user = req.user;
 
   try {
-    // const recording = await ovClient.startRecording(session.sessionId);
-    // // TODO: Signal to room that recording has started
-    // res.status(200).json(recording);
+    const session = await fetchRoomSession(roomId);
+
+    if (!session) {
+      throw new Error('The session does not exist');
+    }
+
+    if (session.recording) {
+      throw new Error('The session is already being recorded');
+    }
+
+    const recording = await ovClient.startRecording(session.sessionId);
+    session.recordingId = recording.id;
+    session.recordingStartedAt = new Date(recording.createdAt);
+    session.recordingUser = user;
+
+    await signalRecordingStarted(roomId, recording, user);
+
+    return res.status(200).end();
   } catch (err) {
     console.error(err);
-    res.status(409).json({ message: err.message });
+    res.status(500).send(err.message);
   }
 };

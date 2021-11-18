@@ -1,9 +1,22 @@
 import mongoose from '../config/mongoose.js';
+import { ovClient } from '../config/openvidu.js';
 import socketio from '../config/socketio.js';
 import Room from '../models/room.js';
 import User from '../models/user.js';
+import { signalRecordingEnded } from './recordingEnded.js';
 
 export const signalCallEnded = async roomId => {
+  // If there was an active recording, stop it
+  const session = ovClient.activeSessions.find(s => s.sessionId === roomId);
+  if (session?.recordingId) {
+    try {
+      const recording = await ovClient.stopRecording(session.recordingId);
+      await signalRecordingEnded(roomId, recording, session.recordingUser);
+    } catch (err) {
+      console.error('Failed to stop recording', err);
+    }
+  }
+
   // Finding all call started messages
   const callStartedMessages = (
     await Room.aggregate([

@@ -53,8 +53,11 @@ const RoomListItem = props => {
           name={room.name}
           src={room.image && `/api/room/${room._id}/image?id=${room.image}`}
           boxShadow={
-            callSession.data?.active &&
-            '0px 0px 0px 3px var(--chakra-colors-green-400)'
+            callSession.data?.recording
+              ? '0px 0px 0px 3px var(--chakra-colors-red-600)'
+              : callSession.data?.active
+              ? '0px 0px 0px 3px var(--chakra-colors-green-400)'
+              : undefined
           }
         >
           {room.onlineUserCount > 1 && (

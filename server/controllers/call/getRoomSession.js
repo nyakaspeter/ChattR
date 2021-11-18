@@ -10,6 +10,8 @@ export const getRoomSession = async (req, res) => {
       return res.json({
         active: true,
         createdAt: new Date(session.createdAt),
+        recording: session.recording,
+        recordingStartedAt: session.recordingStartedAt,
       });
     }
 

@@ -11,8 +11,9 @@ export const getRoomToken = async (req, res) => {
 
     if (!session) {
       session = await createRoomSession(roomId);
-
-      await signalCallStarted(roomId, caller, new Date(session.createdAt));
+      if (session.createdAt) {
+        await signalCallStarted(roomId, caller, new Date(session.createdAt));
+      }
     }
 
     const connection = await session.createConnection({

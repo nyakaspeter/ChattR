@@ -107,7 +107,7 @@ const RoomHeader = props => {
             onClick={handleOpenCallPanel}
             borderRadius="full"
             p={3}
-            colorScheme="green"
+            colorScheme={callSession.recording ? 'red' : 'green'}
           >
             <HStack>
               <MdCall size={20} />

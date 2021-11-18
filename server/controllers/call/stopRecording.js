@@ -1,28 +1,31 @@
-import { ovClient } from '../../config/openvidu.js';
-import Message from '../../models/message.js';
-import Room from '../../models/room.js';
+import { fetchRoomSession, ovClient } from '../../config/openvidu.js';
+import { signalRecordingEnded } from '../../signals/recordingEnded.js';
 
 export const stopRecording = async (req, res) => {
   const roomId = req.params.roomId;
-  const recordingId = req.body.id;
-  //const session = sessions[roomId];
+  const user = req.user;
 
   try {
-    const recording = await ovClient.stopRecording(recordingId);
+    const session = await fetchRoomSession(roomId);
 
-    const newMessage = new Message({
-      sender: req.user._id,
-      date: new Date(),
-      text: `Recording done: ${recording.url}`,
-    });
+    if (!session) {
+      throw new Error('The session does not exist');
+    }
 
-    await Room.findByIdAndUpdate(roomId, { $push: { messages: newMessage } });
+    if (!session.recordingId) {
+      throw new Error('The session is not being recorded');
+    }
 
-    // TODO: Signal to room that recording has stopped
+    const recording = await ovClient.stopRecording(session.recordingId);
+    session.recordingId = undefined;
+    session.recordingStartedAt = undefined;
+    session.recordingUser = undefined;
 
-    res.status(200).json(recording);
+    await signalRecordingEnded(roomId, recording, user);
+
+    return res.status(200).end();
   } catch (err) {
     console.error(err);
-    res.status(409).json({ message: err.message });
+    res.status(500).send(err.message);
   }
 };

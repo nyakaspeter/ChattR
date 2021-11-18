@@ -71,3 +71,11 @@ export async function getRoomToken(roomId) {
 export async function hangupCall(roomId) {
   return (await api.get(`room/${roomId}/hangup`)).data;
 }
+
+export async function startRecording(roomId) {
+  return (await api.get(`room/${roomId}/recording/start`)).data;
+}
+
+export async function stopRecording(roomId) {
+  return (await api.get(`room/${roomId}/recording/stop`)).data;
+}
