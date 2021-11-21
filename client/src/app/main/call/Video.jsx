@@ -4,9 +4,12 @@ import { Spinner } from '@chakra-ui/spinner';
 import { Fade } from '@chakra-ui/transition';
 import React, { useEffect, useRef, useState } from 'react';
 import { MdMicOff } from 'react-icons/md';
+import { useCallSettings } from '../../../core/store';
 
 const Video = props => {
   const { streamManager, users, ...rest } = props;
+
+  const callSettings = useCallSettings();
 
   const [loading, setLoading] = useState(true);
   const [speaking, setSpeaking] = useState(false);
@@ -65,6 +68,9 @@ const Video = props => {
     >
       <video
         ref={video}
+        muted={
+          streamManager.remote ? !callSettings.soundEnabled.value : undefined
+        }
         style={{
           position: 'absolute',
           right: 0,

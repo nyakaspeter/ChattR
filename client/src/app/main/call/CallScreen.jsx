@@ -56,6 +56,8 @@ const CallScreen = props => {
       : undefined;
 
   const connectToSession = async () => {
+    if (session.current) return;
+
     try {
       session.current = openvidu.initSession();
 
@@ -277,7 +279,14 @@ const CallScreen = props => {
               >
                 <MdCallEnd size={24} />
               </IconButton>
-              <IconButton onClick={toggleSound} size="lg" borderRadius="full">
+              <IconButton
+                onClick={toggleSound}
+                size="lg"
+                borderRadius="full"
+                colorScheme={
+                  !callSettings.soundEnabled.value ? 'red' : undefined
+                }
+              >
                 {callSettings.soundEnabled.value ? (
                   <MdVolumeUp size={24} />
                 ) : (
