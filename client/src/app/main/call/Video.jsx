@@ -28,7 +28,7 @@ const Video = props => {
       hasAudio: streamManager.stream.hasAudio,
       hasVideo: streamManager.stream.hasVideo,
       typeOfVideo: streamManager.stream.typeOfVideo,
-      data: streamManager.stream.connection.data,
+      data: streamManager.stream.connection?.data,
     });
 
   useEffect(() => {

@@ -76,7 +76,7 @@ const RoomHeader = props => {
     copyCurrentUrl();
     toast({
       title: 'Room link copied!',
-      description: "The room's link has been copied to the clipboard",
+      description: 'Send it to whoever you want to invite to the room',
       status: 'success',
       isClosable: true,
     });

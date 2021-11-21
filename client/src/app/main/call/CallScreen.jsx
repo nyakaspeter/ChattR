@@ -1,6 +1,7 @@
 import { Button, IconButton } from '@chakra-ui/button';
 import { Box, Center, HStack, Text, VStack } from '@chakra-ui/layout';
 import { SlideFade } from '@chakra-ui/transition';
+import { useHookstate } from '@hookstate/core';
 import React, { useEffect, useRef, useState } from 'react';
 import { useBeforeunload } from 'react-beforeunload';
 import { BsRecordFill } from 'react-icons/bs';
@@ -30,18 +31,29 @@ const CallScreen = props => {
   const user = useUser();
   const own = user.data._id === room.owner;
 
-  const [showControls] = useState(true);
-  const [screenShare, setScreenShare] = useState(false);
+  const queryClient = useQueryClient();
+  const callSettings = useCallSettings();
+  const callSession = useOpenViduSession(room._id);
+  const publisher = useRef();
+  const session = useRef();
+
+  const selectedDevices = useHookstate({
+    cam: callSettings.selectedCam.value,
+    mic: callSettings.selectedMic.value,
+  });
   const [error, setError] = useState(false);
   const [local, setLocal] = useState();
   const [peers, setPeers] = useState([]);
 
-  const queryClient = useQueryClient();
-  const callSettings = useCallSettings();
-  const callSession = useOpenViduSession(room._id);
-  const initializing = useRef();
-  const publisher = useRef();
-  const session = useRef();
+  const getFilter = () =>
+    callSettings.nameOverlay.value
+      ? {
+          type: 'GStreamerFilter',
+          options: {
+            command: `textoverlay text="${user.data.name}" valignment=top halignment=right font-desc="Cantarell 16"`,
+          },
+        }
+      : undefined;
 
   const connectToSession = async () => {
     try {
@@ -66,91 +78,124 @@ const CallScreen = props => {
   };
 
   const initPublisher = async () => {
+    if (!session.current.connection) {
+      return;
+    }
+
+    if (!selectedDevices.cam.value && !selectedDevices.mic.value) {
+      return;
+    }
+
     publisher.current = await openvidu.initPublisherAsync(undefined, {
-      publishVideo: callSettings.camEnabled.value,
+      publishVideo:
+        selectedDevices.cam.value === 'screen'
+          ? true
+          : callSettings.camEnabled.value,
       publishAudio: callSettings.micEnabled.value,
-      videoSource: callSettings.selectedCam.value || false,
-      audioSource: callSettings.selectedMic.value || false,
+      videoSource: selectedDevices.cam.value || false,
+      audioSource: selectedDevices.mic.value || false,
       mirror: false,
-      filter: callSettings.nameOverlay.value
-        ? {
-            type: 'GStreamerFilter',
-            options: {
-              command: `textoverlay text="${user.data.name}" valignment=top halignment=right font-desc="Cantarell 16"`,
-            },
-          }
-        : undefined,
+      filter: getFilter(),
     });
     setLocal(publisher.current);
+
+    if (selectedDevices.cam.value === 'screen') {
+      subscribeToScreenShareEnd();
+    }
+
+    await session.current.publish(publisher.current);
   };
 
-  const publishStream = async () => {
-    if (initializing.current) return;
+  const updatePublisher = async () => {
+    const currentTracks =
+      publisher.current.stream.mediaStream.getTracks().length;
+    let newTracks = 0;
+    if (selectedDevices.cam.value) newTracks++;
+    if (selectedDevices.mic.value) newTracks++;
 
-    try {
-      if (!publisher.current) {
-        initializing.current = true;
-        await initPublisher();
-        await session.current.publish(publisher.current);
-        initializing.current = false;
-      } else {
-        await openvidu
-          .getUserMedia({
-            videoSource: screenShare
-              ? 'screen'
-              : callSettings.selectedCam.value || false,
-            audioSource: callSettings.selectedMic.value || false,
-          })
-          .then(
-            async stream => {
-              const videoTracks = stream.getVideoTracks();
-              const audioTracks = stream.getAudioTracks();
-
-              if (
-                !publisher.current.stream.hasVideo ||
-                !publisher.current.stream.hasAudio
-              ) {
-                // TODO: Have to create a new publisher to add/remove tracks
-              } else {
-                if (videoTracks.length > 0 && publisher.current.stream.hasVideo)
-                  await publisher.current.replaceTrack(videoTracks[0]);
-                if (audioTracks.length > 0 && publisher.current.stream.hasAudio)
-                  await publisher.current.replaceTrack(audioTracks[0]);
-
-                // TODO: Resubscribe to speaking events on the local video
-                // Have to set it again manually because of a bug
-                publisher.current.videoReference.muted = true;
-              }
-
-              publisher.current.publishVideo(
-                screenShare ? true : callSettings.camEnabled.value
-              );
-
-              if (screenShare) {
-                publisher.current.stream
-                  .getMediaStream()
-                  .getVideoTracks()[0]
-                  .addEventListener('ended', () => setScreenShare(false));
-              }
-            },
-            error => {
-              if (screenShare) {
-                console.error('Failed to share screen', error);
-                setScreenShare(false);
-              }
-            }
-          );
-      }
-    } catch (err) {
-      console.error('Failed to publish stream', err);
-      setError(true);
+    if (currentTracks !== newTracks) {
+      await stopStream();
+      await initPublisher();
+      return;
     }
+
+    await openvidu
+      .getUserMedia({
+        videoSource: selectedDevices.cam.value || false,
+        audioSource: selectedDevices.mic.value || false,
+      })
+      .then(
+        async stream => {
+          const videoTracks = stream.getVideoTracks();
+          const audioTracks = stream.getAudioTracks();
+
+          if (videoTracks.length > 0 && publisher.current.stream.hasVideo)
+            await publisher.current.replaceTrack(videoTracks[0]);
+          if (audioTracks.length > 0 && publisher.current.stream.hasAudio)
+            await publisher.current.replaceTrack(audioTracks[0]);
+
+          // TODO: Resubscribe to speaking events on the local video
+
+          // Have to set it again manually because of a bug
+          publisher.current.videoReference.muted = true;
+
+          publisher.current.publishVideo(
+            selectedDevices.cam.value === 'screen'
+              ? true
+              : callSettings.camEnabled.value
+          );
+
+          if (selectedDevices.cam.value === 'screen') {
+            subscribeToScreenShareEnd();
+          }
+        },
+        async error => {
+          if (selectedDevices.cam.value === 'screen') {
+            console.error('Failed to share screen', error);
+            selectedDevices.cam.set(callSettings.selectedCam.value);
+          } else {
+            console.error('Failed to update stream', error);
+            await stopStream();
+            await initPublisher();
+          }
+        }
+      );
+  };
+
+  const updateStream = async () => {
+    if (!publisher.current) {
+      await initPublisher();
+    } else {
+      await updatePublisher();
+    }
+  };
+
+  const stopStream = async () => {
+    await session.current.unpublish(publisher.current);
+    publisher.current = undefined;
+    setLocal(undefined);
+  };
+
+  const subscribeToScreenShareEnd = () => {
+    publisher.current.stream
+      .getMediaStream()
+      .getVideoTracks()[0]
+      .addEventListener('ended', () => {
+        selectedDevices.cam.set(callSettings.selectedCam.value);
+      });
   };
 
   const toggleCam = () => callSettings.camEnabled.set(e => !e);
   const toggleMic = () => callSettings.micEnabled.set(e => !e);
   const toggleSound = () => callSettings.soundEnabled.set(e => !e);
-  const toggleScreenShare = () => setScreenShare(!screenShare);
+  const toggleScreenShare = () => {
+    if (selectedDevices.cam.value === 'screen') {
+      publisher.current?.publishVideo(false);
+      selectedDevices.cam.set(callSettings.selectedCam.value);
+    } else {
+      selectedDevices.cam.set('screen');
+    }
+  };
 
   const hangupMutation = useMutation(roomId => hangupCall(roomId));
   const handleHangup = () => {
@@ -170,26 +215,33 @@ const CallScreen = props => {
 
   useEffect(async () => {
     await connectToSession();
-    await publishStream();
+    await updateStream();
   }, []);
 
   useEffect(async () => {
-    await publishStream();
-  }, [
-    callSettings.selectedCam.value,
-    callSettings.selectedMic.value,
-    screenShare,
-  ]);
+    if (session.current.connection) {
+      await updateStream();
+    }
+  }, [selectedDevices.cam.value, selectedDevices.mic.value]);
 
   useEffect(() => {
     publisher.current?.publishVideo(
-      screenShare ? true : callSettings.camEnabled.value
+      selectedDevices.cam.value === 'screen'
+        ? true
+        : callSettings.camEnabled.value
     );
   }, [callSettings.camEnabled.value]);
 
   useEffect(() => {
     publisher.current?.publishAudio(callSettings.micEnabled.value);
   }, [callSettings.micEnabled.value]);
+
+  useEffect(() => {
+    selectedDevices.batch(s => {
+      if (s.cam !== 'screen') s.cam.set(callSettings.selectedCam.value);
+      s.mic.set(callSettings.selectedMic.value);
+    });
+  }, [callSettings.selectedCam.value, callSettings.selectedMic.value]);
 
   if (error)
     return (
@@ -208,14 +260,14 @@ const CallScreen = props => {
       <Center position="relative" pb={20} {...rest}>
         <Box m={4} w="100%" h="100%">
           <VideoGrid
-            videos={[local, ...peers]}
+            videos={[...(local ? [local] : []), ...peers]}
             users={room.users}
             spacing={4}
           />
         </Box>
 
         <Box position="absolute" bottom={0}>
-          <SlideFade in={showControls} offsetY="20px">
+          <SlideFade in offsetY="20px">
             <HStack m={4} spacing={4} flexWrap="wrap" justifyContent="center">
               <IconButton
                 onClick={handleHangup}
@@ -232,26 +284,30 @@ const CallScreen = props => {
                   <MdVolumeOff size={24} />
                 )}
               </IconButton>
-              <IconButton onClick={toggleMic} size="lg" borderRadius="full">
-                {callSettings.micEnabled.value ? (
-                  <MdMic size={24} />
-                ) : (
-                  <MdMicOff size={24} />
-                )}
-              </IconButton>
-              <IconButton onClick={toggleCam} size="lg" borderRadius="full">
-                {callSettings.camEnabled.value ? (
-                  <MdVideocam size={24} />
-                ) : (
-                  <MdVideocamOff size={24} />
-                )}
-              </IconButton>
+              {callSettings.selectedMic.value && (
+                <IconButton onClick={toggleMic} size="lg" borderRadius="full">
+                  {callSettings.micEnabled.value ? (
+                    <MdMic size={24} />
+                  ) : (
+                    <MdMicOff size={24} />
+                  )}
+                </IconButton>
+              )}
+              {callSettings.selectedCam.value && (
+                <IconButton onClick={toggleCam} size="lg" borderRadius="full">
+                  {callSettings.camEnabled.value ? (
+                    <MdVideocam size={24} />
+                  ) : (
+                    <MdVideocamOff size={24} />
+                  )}
+                </IconButton>
+              )}
               <IconButton
                 onClick={toggleScreenShare}
                 size="lg"
                 borderRadius="full"
               >
-                {screenShare ? (
+                {selectedDevices.cam.value === 'screen' ? (
                   <MdStopScreenShare size={24} />
                 ) : (
                   <MdScreenShare size={24} />

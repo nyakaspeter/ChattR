@@ -7,9 +7,10 @@ import React from 'react';
 import { BsRecordFill } from 'react-icons/bs';
 import { FaRegFile } from 'react-icons/fa';
 import { MdCall, MdCallEnd } from 'react-icons/md';
-import { useMutation } from 'react-query';
 import { useOpenViduToken } from '../../../core/query';
+import { useUiState } from '../../../core/store';
 import { toHHMMSS } from '../../../core/utils';
+import CallSetup from '../call/CallSetup';
 
 const MessageListItem = props => {
   const { own, roomId, message, sender, showAvatar, ...rest } = props;
@@ -18,9 +19,11 @@ const MessageListItem = props => {
   const ownMessageBg = useColorModeValue('blue.100', 'blue.600');
   const fileBg = useColorModeValue('blackAlpha.200', 'blackAlpha.300');
 
+  const uiState = useUiState();
   const callToken = useOpenViduToken(roomId);
-  const callMutation = useMutation(callToken.refetch);
-  const handleJoinCall = () => callMutation.mutate();
+  const handleJoinCall = () => {
+    uiState.currentPanel.set({ title: 'Call', content: CallSetup });
+  };
 
   const MessageAvatar = (
     <Avatar
@@ -70,11 +73,7 @@ const MessageListItem = props => {
               {sender.name} started a call
             </Text>
             {!callToken.data?.token && (
-              <Button
-                onClick={handleJoinCall}
-                isLoading={callMutation.isLoading}
-                size="sm"
-              >
+              <Button onClick={handleJoinCall} size="sm">
                 Join
               </Button>
             )}

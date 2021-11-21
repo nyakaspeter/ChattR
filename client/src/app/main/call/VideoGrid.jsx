@@ -27,8 +27,13 @@ const VideoGrid = props => {
       boxAspectRatio={4 / 3}
       updateLayoutRef={updateLayout}
     >
-      {videos.map((video, i) => (
-        <Box key={i} w="100%" h="100%" display="grid">
+      {videos.map(video => (
+        <Box
+          key={video.remote ? video.stream.connection.connectionId : 'local'}
+          w="100%"
+          h="100%"
+          display="grid"
+        >
           <Video streamManager={video} users={users} m={spacing / 2}></Video>
         </Box>
       ))}
