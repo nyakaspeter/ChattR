@@ -3,7 +3,6 @@ import { HamburgerIcon } from '@chakra-ui/icons';
 import { Box, Flex } from '@chakra-ui/layout';
 import { useBreakpointValue } from '@chakra-ui/media-query';
 import { Drawer, DrawerContent, DrawerOverlay } from '@chakra-ui/modal';
-import { Fade } from '@chakra-ui/transition';
 import React from 'react';
 import { useSocket } from '../../core/query';
 import { useUiState } from '../../core/store';
@@ -21,13 +20,8 @@ const Main = () => {
   return (
     <>
       <Flex w="100vw" h="100vh" position="relative">
-        <Box position="absolute" top={4} left={3}>
-          <Fade
-            in={!uiState.showRoomList.value}
-            transition={{
-              enter: { delay: 0.25 },
-            }}
-          >
+        {!uiState.showRoomList.value && (
+          <Box position="absolute" top={4} left={3}>
             <IconButton
               onClick={handleToggleRoomList}
               borderRadius="full"
@@ -35,16 +29,16 @@ const Main = () => {
             >
               <HamburgerIcon />
             </IconButton>
-          </Fade>
-        </Box>
-
-        <RoomList
-          flex="1"
-          maxW={permanentDrawer && uiState.showRoomList.value ? '360px' : '0px'}
-          overflow="hidden"
-          borderRightWidth="1px"
-          transition="max-width 0.25s"
-        />
+          </Box>
+        )}
+        {permanentDrawer && uiState.showRoomList.value && (
+          <RoomList
+            flex="1"
+            maxW="360px"
+            overflow="hidden"
+            borderRightWidth="1px"
+          />
+        )}
         <Room flex="3" />
       </Flex>
 

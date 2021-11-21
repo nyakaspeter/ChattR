@@ -14,10 +14,7 @@ const VideoGrid = props => {
   const uiState = useUiState();
 
   useEffect(
-    () =>
-      setTimeout(() => {
-        if (updateLayout?.current) updateLayout.current();
-      }, 250),
+    () => updateLayout.current(),
     [uiState.currentPanel.value, uiState.showRoomList.value]
   );
 

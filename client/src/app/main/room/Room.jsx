@@ -77,20 +77,17 @@ const Room = props => {
               )}
             </VStack>
 
-            <SidePanel
-              flex="1"
-              maxW={
-                permanentDrawer && !!uiState.currentPanel.value
-                  ? '360px'
-                  : '0px'
-              }
-              overflow="hidden"
-              borderLeftWidth="1px"
-              transition="max-width 0.25s"
-              title={uiState.currentPanel?.title?.value}
-              content={uiState.currentPanel?.content?.value}
-              room={room.data}
-            />
+            {permanentDrawer && !!uiState.currentPanel.value && (
+              <SidePanel
+                flex="1"
+                maxW="360px"
+                overflow="hidden"
+                borderLeftWidth="1px"
+                title={uiState.currentPanel?.title?.value}
+                content={uiState.currentPanel?.content?.value}
+                room={room.data}
+              />
+            )}
 
             <Drawer
               placement="right"
