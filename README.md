@@ -39,6 +39,7 @@ When you have OpenVidu ready, you can deploy ChattR following these steps:
 - Clone the ChattR repo
   - `git clone https://github.com/nyakaspeter/ChattR.git`
 - Set up the environmental variables by renaming the `.env.example` file to `.env` and setting the values. See the notes in the file for more information.
+  - If you want to use the call recording feature, set `OPENVIDU_RECORDING` to true.
 - Once the variables are set up properly, you can spin up ChattR with docker-compose
   - `docker-compose up` (from the repo root folder)
 
@@ -60,13 +61,16 @@ The steps of deployment are the following (you can issue these commands on basic
 - Deploy OpenVidu platform
   - `cd /opt`
   - `curl https://s3-eu-west-1.amazonaws.com/aws.openvidu.io/install_openvidu_2.20.0.sh | bash`
+  - `cd openvidu`
 - Clone the ChattR repo
   - `git clone https://github.com/nyakaspeter/ChattR.git`
 - Override OpenVidu's default configuration files
   - `mv ./ChattR/docker-compose.openvidu.yml docker-compose.override.yml`
+  - `mv ./ChattR/call_layout custom-layout`
   - `cat ./ChattR/.env.openvidu.example >> .env`
 - Set up the environmental variables by editing the `.env` file, see the notes in the file for more information
-  - Make sure that `SUPPORT_DEPRECATED_API` is set to false! Otherwise OpenVidu will override the paths for the ChattR backend.
+  - Make sure that `SUPPORT_DEPRECATED_API` is set to false and not commented out! Otherwise OpenVidu will override the paths for the ChattR backend.
+  - If you want to use the call recording feature, set `OPENVIDU_RECORDING` to true.
 - Once the variables are set up properly, you can manage the lifecycle of ChattR along with the OpenVidu platform with the following commands
   - Start: `./openvidu start`
   - Stop: `./openvidu stop`
