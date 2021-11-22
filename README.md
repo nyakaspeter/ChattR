@@ -39,7 +39,6 @@ When you have OpenVidu ready, you can deploy ChattR following these steps:
 - Clone the ChattR repo
   - `git clone https://github.com/nyakaspeter/ChattR.git`
 - Set up the environmental variables by renaming the `.env.example` file to `.env` and setting the values. See the notes in the file for more information.
-  - If you want to use the call recording feature, set `OPENVIDU_RECORDING` to true.
 - Once the variables are set up properly, you can spin up ChattR with docker-compose
   - `docker-compose up` (from the repo root folder)
 
