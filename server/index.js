@@ -1,6 +1,5 @@
 import MongoStore from 'connect-mongo';
 import cors from 'cors';
-import dotenv from 'dotenv';
 import express from 'express';
 import session from 'express-session';
 import http from 'http';
@@ -9,16 +8,13 @@ import passport from './config/passport.js';
 import socketio from './config/socketio.js';
 import routes from './routes/index.js';
 
-dotenv.config();
-
 const PORT = process.env.PORT || 5000;
-const SESSION_SECRET = process.env.SESSION_SECRET;
+const SESSION_SECRET = process.env.SESSION_SECRET || 'secret';
+
+export const app = express();
+export const server = http.createServer(app);
 
 mongoose.connection.once('open', () => {
-  const app = express();
-
-  const server = http.createServer(app);
-
   const sessionStore = MongoStore.create({
     client: mongoose.connection.getClient(),
   });
@@ -43,5 +39,9 @@ mongoose.connection.once('open', () => {
 
   socketio.init(server, expressSession, passportMw, passportSession);
 
-  server.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+  if (process.env.NODE_ENV !== 'test') {
+    server.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+  }
+
+  app.emit('initialized');
 });

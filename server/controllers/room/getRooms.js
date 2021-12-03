@@ -1,7 +1,4 @@
-import dotenv from 'dotenv';
 import Room from '../../models/room.js';
-
-dotenv.config();
 
 export const getRooms = async (req, res) => {
   const userId = req.user._id;

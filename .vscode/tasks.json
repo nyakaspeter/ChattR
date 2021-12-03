@@ -33,5 +33,11 @@
             },
             "problemMatcher": []
         },
+        {
+            "label": "Run tests (server)",
+            "type": "shell",
+            "command": "yarn workspace server test",
+            "problemMatcher": []
+        },
     ]
 }

@@ -17,5 +17,8 @@
     "rules": {
         "node/no-unsupported-features/es-syntax": 0
     },
+    "ignorePatterns": [
+        "test/*"
+    ],
     "settings": {}
 }

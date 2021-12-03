@@ -1,10 +1,7 @@
 import axios from 'axios';
-import dotenv from 'dotenv';
 import { OpenVidu } from 'openvidu-node-client';
 
-dotenv.config();
-
-const OPENVIDU_URL = process.env.OPENVIDU_URL;
+const OPENVIDU_URL = process.env.OPENVIDU_URL || 'https://localhost:443';
 const OPENVIDU_SECRET = process.env.OPENVIDU_SECRET;
 
 export const ovClient = new OpenVidu(OPENVIDU_URL, OPENVIDU_SECRET);

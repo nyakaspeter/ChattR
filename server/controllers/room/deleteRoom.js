@@ -1,8 +1,5 @@
-import dotenv from 'dotenv';
 import Room from '../../models/room.js';
 import { signalRoomDeleted } from '../../signals/roomDeleted.js';
-
-dotenv.config();
 
 export const deleteRoom = async (req, res) => {
   const roomId = req.params.roomId;

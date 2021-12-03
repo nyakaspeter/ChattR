@@ -4,7 +4,7 @@ import multer from 'multer';
 import { GridFsStorage } from 'multer-gridfs-storage';
 import User from '../models/user.js';
 
-dotenv.config();
+if (process.env.NODE_ENV !== 'test') dotenv.config();
 
 const MONGODB_URL = process.env.MONGODB_URL;
 const UPLOAD_BUCKET_NAME = process.env.MONGODB_UPLOAD_BUCKET_NAME || 'uploads';

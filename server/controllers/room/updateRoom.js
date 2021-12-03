@@ -1,9 +1,6 @@
-import dotenv from 'dotenv';
 import { gfs } from '../../config/mongoose.js';
 import Room from '../../models/room.js';
 import { signalRoomUpdated } from '../../signals/roomUpdated.js';
-
-dotenv.config();
 
 export const updateRoom = async (req, res) => {
   const deleteImage = req.body.image === 'null';

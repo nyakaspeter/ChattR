@@ -1,8 +1,5 @@
-import dotenv from 'dotenv';
 import { gfs } from '../../config/mongoose.js';
 import Room from '../../models/room.js';
-
-dotenv.config();
 
 export const getRoomImage = async (req, res) => {
   const roomId = req.params.roomId;

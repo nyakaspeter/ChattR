@@ -1,7 +1,4 @@
-import dotenv from 'dotenv';
 import Room from '../../models/room.js';
-
-dotenv.config();
 
 export const createRoom = async (req, res) => {
   const date = new Date();
