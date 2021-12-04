@@ -8,6 +8,21 @@ ChattR is a real-time text & video chat application based on modern web technolo
 
 The video & voice in calls in ChattR are handled by the open source [OpenVidu](https://openvidu.io/index) video call application platform, which uses [Kurento](https://www.kurento.org/) WebRTC media server under the hood. The real-time messaging is made possible with WebSockets using [Socket.IO](https://socket.io/)
 
+## Features
+
+- Sign in with Google account
+- Create public or private chat rooms
+- View and send text messages with optional attachments
+- Make voice and video calls with other room members
+- Record and download video conferencing sessions
+
+## Screenshots
+
+![Login screen](https://user-images.githubusercontent.com/43880678/144705633-6eac699e-0841-418f-bf6e-5b4d1d0c9bbd.jpeg)
+![Messages screen](https://user-images.githubusercontent.com/43880678/144705643-5e4a01ba-2258-422d-a20b-1d3c3377f714.jpeg)
+![Call screen](https://user-images.githubusercontent.com/43880678/144705645-e89dc871-8ad8-4ac6-a87b-59f6d8cfb139.jpeg)
+![Create room](https://user-images.githubusercontent.com/43880678/144705736-2931af6f-40b9-4b00-82bd-038261f24a57.jpg)
+
 ## Deployment
 
 ### How to deploy for development
